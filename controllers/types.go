@@ -3,7 +3,8 @@ package controllers
 import "risqlac-api/models"
 
 type ErrorResponse struct {
-	Error error `json:"error"`
+	Message string `json:"message"`
+	Error   error  `json:"error"`
 }
 
 type CreatedUserResponse struct {
@@ -20,4 +21,8 @@ type CreatedProductResponse struct {
 
 type ListProductsResponse struct {
 	Products []models.Product `json:"products"`
+}
+
+type DeleteQuery struct {
+	Id uint64
 }

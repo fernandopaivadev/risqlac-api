@@ -28,8 +28,11 @@ func main() {
 
 	user.Post("/create", controllers.CreateUser)
 	user.Get("/list", controllers.ListUsers)
+	user.Delete("/delete", controllers.DeleteUser)
+
 	product.Post("/create", controllers.CreateProduct)
 	product.Get("/list", controllers.ListProducts)
+	product.Delete("/delete", controllers.DeleteProduct)
 
 	app.Listen(":3000")
 }
