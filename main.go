@@ -1,20 +1,35 @@
 package main
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"risqlac-api/controllers"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
+)
 
 type Response struct {
-	message string
+	Message string `json:"message"`
 }
 
 func main() {
-	server := fiber.New()
+	app := fiber.New()
+	app.Use(logger.New())
+	app.Use(requestid.New())
 
-	server.Get("/", func(context *fiber.Ctx) error {
-		data := Response{
-			message: "AE GAROTO",
-		}
-		return context.Status(fiber.StatusOK).JSON(data)
+	app.Get("/info", func(context *fiber.Ctx) error {
+		return context.Status(fiber.StatusOK).JSON(Response{
+			Message: "RisQLAC API",
+		})
 	})
 
-	server.Listen(":3000")
+	user := app.Group("/user")
+	product := app.Group("/product")
+
+	user.Post("/create", controllers.CreateUser)
+	user.Get("/list", controllers.ListUsers)
+	product.Post("/create", controllers.CreateProduct)
+	product.Get("/list", controllers.ListProducts)
+
+	app.Listen(":3000")
 }
