@@ -4,25 +4,30 @@ import "risqlac-api/models"
 
 type ErrorResponse struct {
 	Message string `json:"message"`
-	Error   error  `json:"error"`
+	Error   string `json:"error"`
 }
 
-type CreatedUserResponse struct {
-	CreatedUser models.User `json:"created_user"`
+type SuccessResponse struct {
+	Message string `json:"message"`
+}
+
+type UserAuthResponse struct {
+	Token string `json:"token"`
 }
 
 type ListUsersResponse struct {
 	Users []models.User `json:"users"`
 }
 
-type CreatedProductResponse struct {
-	CreatedProduct models.Product `json:"created_product"`
-}
-
 type ListProductsResponse struct {
 	Products []models.Product `json:"products"`
 }
 
-type DeleteQuery struct {
+type QueryById struct {
 	Id uint64
+}
+
+type UserAuthQuery struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }

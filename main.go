@@ -2,14 +2,21 @@ package main
 
 import (
 	"risqlac-api/controllers"
+	"risqlac-api/database"
+	"risqlac-api/middleware"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	godotenv.Load()
+
+	database.Setup()
+
 	app := fiber.New()
 
 	app.Use(logger.New())
@@ -24,15 +31,17 @@ func main() {
 	})
 
 	userRoutes := app.Group("/user")
-	productRoutes := app.Group("/product")
-
-	userRoutes.Post("/create", controllers.CreateUser)
-	userRoutes.Get("/list", controllers.ListUsers)
+	userRoutes.Get("/auth", controllers.UserAuth)
+	userRoutes.Post("/create", middleware.ValidateToken, controllers.CreateUser)
+	userRoutes.Put("/update", middleware.ValidateToken, controllers.UpdateUser)
+	userRoutes.Get("/list", middleware.ValidateToken, middleware.ValidateToken, controllers.ListUsers)
 	userRoutes.Delete("/delete", controllers.DeleteUser)
 
-	productRoutes.Post("/create", controllers.CreateProduct)
-	productRoutes.Get("/list", controllers.ListProducts)
-	productRoutes.Delete("/delete", controllers.DeleteProduct)
+	productRoutes := app.Group("/product")
+	productRoutes.Post("/create", middleware.ValidateToken, controllers.CreateProduct)
+	productRoutes.Put("/update", middleware.ValidateToken, controllers.UpdateProduct)
+	productRoutes.Get("/list", middleware.ValidateToken, controllers.ListProducts)
+	productRoutes.Delete("/delete", middleware.ValidateToken, controllers.DeleteProduct)
 
 	app.Listen(":3000")
 }

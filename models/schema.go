@@ -5,10 +5,10 @@ import (
 )
 
 type User struct {
-	Id         uint64    `json:"id"`
-	Username   string    `json:"username"`
+	Id         uint64    `json:"id" gorm:"unique; autoIncrement; primaryKey"`
+	Username   string    `json:"username" gorm:"unique"`
+	Email      string    `json:"email" gorm:"unique"`
 	Name       string    `json:"name"`
-	Email      string    `json:"email"`
 	Phone      string    `json:"phone"`
 	Password   string    `json:"password"`
 	Is_admin   bool      `json:"is_admin"`
@@ -17,7 +17,7 @@ type User struct {
 }
 
 type Product struct {
-	Id              uint64    `json:"id"`
+	Id              uint64    `json:"id" gorm:"autoIncrement; primaryKey"`
 	Synonym         string    `json:"synonym"`
 	Class           string    `json:"class"`
 	Subclass        string    `json:"subclass"`
