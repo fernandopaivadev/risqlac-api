@@ -14,7 +14,6 @@ import (
 
 func main() {
 	godotenv.Load()
-
 	database.Setup()
 
 	app := fiber.New()
@@ -31,17 +30,54 @@ func main() {
 	})
 
 	userRoutes := app.Group("/user")
-	userRoutes.Get("/auth", controllers.UserAuth)
-	userRoutes.Post("/create", middleware.ValidateToken, controllers.CreateUser)
-	userRoutes.Put("/update", middleware.ValidateToken, controllers.UpdateUser)
-	userRoutes.Get("/list", middleware.ValidateToken, middleware.ValidateToken, controllers.ListUsers)
-	userRoutes.Delete("/delete", controllers.DeleteUser)
+	userRoutes.Get(
+		"/auth",
+		controllers.UserAuth,
+	)
+	userRoutes.Post(
+		"/create",
+		middleware.ValidateToken,
+		controllers.CreateUser,
+	)
+	userRoutes.Put(
+		"/update",
+		middleware.ValidateToken,
+		controllers.UpdateUser,
+	)
+	userRoutes.Get(
+		"/list",
+		middleware.ValidateToken,
+		middleware.VerifyAdmin,
+		controllers.ListUsers,
+	)
+	userRoutes.Delete(
+		"/delete",
+		middleware.ValidateToken,
+		middleware.VerifyAdmin,
+		controllers.DeleteUser,
+	)
 
 	productRoutes := app.Group("/product")
-	productRoutes.Post("/create", middleware.ValidateToken, controllers.CreateProduct)
-	productRoutes.Put("/update", middleware.ValidateToken, controllers.UpdateProduct)
-	productRoutes.Get("/list", middleware.ValidateToken, controllers.ListProducts)
-	productRoutes.Delete("/delete", middleware.ValidateToken, controllers.DeleteProduct)
+	productRoutes.Post(
+		"/create",
+		middleware.ValidateToken,
+		controllers.CreateProduct,
+	)
+	productRoutes.Put(
+		"/update",
+		middleware.ValidateToken,
+		controllers.UpdateProduct,
+	)
+	productRoutes.Get(
+		"/list",
+		middleware.ValidateToken,
+		controllers.ListProducts,
+	)
+	productRoutes.Delete(
+		"/delete",
+		middleware.ValidateToken,
+		controllers.DeleteProduct,
+	)
 
 	app.Listen(":3000")
 }

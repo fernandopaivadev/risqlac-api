@@ -48,14 +48,23 @@ func GenerateUserToken(email string, password string) (string, error) {
 	return tokenString, nil
 }
 
-func ValidateUserToken(tokenString string) (bool, error) {
+func ValidateUserToken(tokenString string) (bool, jwt.MapClaims, error) {
 	JWT_SECRET := os.Getenv("JWT_SECRET")
 
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 		return []byte(JWT_SECRET), nil
 	})
 
-	return token.Valid, err
+	if err != nil {
+		return false, nil, err
+	}
+
+	if token.Valid {
+		claims, _ := token.Claims.(jwt.MapClaims)
+		return true, claims, nil
+	}
+
+	return false, nil, nil
 }
 
 func CreateUser(user models.User) error {

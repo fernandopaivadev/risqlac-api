@@ -12,7 +12,7 @@ func UserAuth(context *fiber.Ctx) error {
 	err := context.QueryParser(&query)
 
 	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(ErrorResponse{
+		return context.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{
 			Message: "Error parsing query params",
 			Error:   err.Error(),
 		})
@@ -46,7 +46,7 @@ func CreateUser(context *fiber.Ctx) error {
 	err = services.CreateUser(user)
 
 	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(ErrorResponse{
+		return context.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{
 			Message: "Error creating user",
 			Error:   err.Error(),
 		})
@@ -62,7 +62,7 @@ func UpdateUser(context *fiber.Ctx) error {
 	err := context.BodyParser(&user)
 
 	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(ErrorResponse{
+		return context.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{
 			Message: "Error parsing body params",
 			Error:   err.Error(),
 		})
@@ -71,13 +71,13 @@ func UpdateUser(context *fiber.Ctx) error {
 	err = services.UpdateUser(user)
 
 	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(ErrorResponse{
+		return context.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{
 			Message: "Error updating user",
 			Error:   err.Error(),
 		})
 	}
 
-	return context.Status(fiber.StatusCreated).JSON(SuccessResponse{
+	return context.Status(fiber.StatusOK).JSON(SuccessResponse{
 		Message: "User updated",
 	})
 }
@@ -87,7 +87,7 @@ func ListUsers(context *fiber.Ctx) error {
 	err := context.QueryParser(&query)
 
 	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(ErrorResponse{
+		return context.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{
 			Message: "Error parsing query params",
 			Error:   err.Error(),
 		})
@@ -96,13 +96,13 @@ func ListUsers(context *fiber.Ctx) error {
 	users, err := services.ListUsers(query.Id)
 
 	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(ErrorResponse{
+		return context.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{
 			Message: "Error retrieving users",
 			Error:   err.Error(),
 		})
 	}
 
-	return context.Status(fiber.StatusCreated).JSON(ListUsersResponse{
+	return context.Status(fiber.StatusOK).JSON(ListUsersResponse{
 		Users: users,
 	})
 }
@@ -112,7 +112,7 @@ func DeleteUser(context *fiber.Ctx) error {
 	err := context.QueryParser(&query)
 
 	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(ErrorResponse{
+		return context.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{
 			Message: "Error parsing query params",
 			Error:   err.Error(),
 		})
@@ -121,7 +121,7 @@ func DeleteUser(context *fiber.Ctx) error {
 	err = services.DeleteUser(query.Id)
 
 	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(ErrorResponse{
+		return context.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{
 			Message: "Error deleting user",
 			Error:   err.Error(),
 		})
