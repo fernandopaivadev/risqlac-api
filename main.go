@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	environment.Setup()
+	environment.Load()
 	database.Setup()
 
 	app := fiber.New()
@@ -78,5 +78,9 @@ func main() {
 		controllers.DeleteProduct,
 	)
 
-	app.Listen(":3000")
+	err := app.Listen(":3000")
+
+	if err != nil {
+		panic("Error starting server: " + err.Error())
+	}
 }
