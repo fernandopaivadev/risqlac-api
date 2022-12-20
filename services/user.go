@@ -9,7 +9,6 @@ import (
 
 	"github.com/golang-jwt/jwt/v4"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
 
 func GenerateUserToken(email string, password string) (string, error) {
@@ -103,15 +102,22 @@ func UpdateUser(user models.User) error {
 	return nil
 }
 
-func ListUsers(userId uint64) ([]models.User, error) {
-	var users []models.User
-	var result *gorm.DB
+func GetUser(userId uint64) (models.User, error) {
+	var user models.User
 
-	if userId == 0 {
-		result = database.Instance.Find(&users)
-	} else {
-		result = database.Instance.Find(&users, []uint64{userId})
+	result := database.Instance.First(&user, userId)
+
+	if result.Error != nil {
+		return models.User{}, result.Error
 	}
+
+	return user, nil
+}
+
+func ListUsers() ([]models.User, error) {
+	var users []models.User
+
+	result := database.Instance.Find(&users)
 
 	if result.Error != nil {
 		return []models.User{}, result.Error

@@ -21,12 +21,12 @@ func ValidateToken(context *fiber.Ctx) error {
 	}
 
 	if !isValid {
-		return context.Status(fiber.StatusUnauthorized).JSON(ErrorResponse{
+		return context.Status(fiber.StatusUnauthorized).JSON(MessageResponse{
 			Message: "Invalid token",
 		})
 	}
 
-	claimsObject := TokenClaims{}
+	var claimsObject TokenClaims
 	claimsJSON, _ := json.Marshal(claims)
 	err = json.Unmarshal(claimsJSON, &claimsObject)
 
@@ -37,7 +37,7 @@ func ValidateToken(context *fiber.Ctx) error {
 		})
 	}
 
-	users, err := services.ListUsers(claimsObject.User_Id)
+	user, err := services.GetUser(claimsObject.User_Id)
 
 	if err != nil {
 		return context.Status(fiber.StatusUnauthorized).JSON(ErrorResponse{
@@ -46,13 +46,8 @@ func ValidateToken(context *fiber.Ctx) error {
 		})
 	}
 
-	if len(users) <= 0 {
-		return context.Status(fiber.StatusUnauthorized).JSON(ErrorResponse{
-			Message: "User not found",
-		})
-	}
+	context.Request().Header.Add("user_id", fmt.Sprint(user.Id))
+	context.Request().Header.Add("is_admin", fmt.Sprint(user.Is_admin))
 
-	context.Request().Header.Add("user_id", fmt.Sprint(users[0].Id))
-	context.Request().Header.Add("is_admin", fmt.Sprint(users[0].Is_admin))
 	return context.Next()
 }

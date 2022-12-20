@@ -3,8 +3,6 @@ package services
 import (
 	"risqlac-api/database"
 	"risqlac-api/models"
-
-	"gorm.io/gorm"
 )
 
 func CreateProduct(product models.Product) error {
@@ -40,15 +38,22 @@ func UpdateProduct(user models.Product) error {
 	return nil
 }
 
-func ListProducts(productId uint64) ([]models.Product, error) {
-	var products []models.Product
-	var result *gorm.DB
+func GetProduct(productId uint64) (models.Product, error) {
+	var product models.Product
 
-	if productId == 0 {
-		result = database.Instance.Find(&products)
-	} else {
-		result = database.Instance.Find(&products, []uint64{productId})
+	result := database.Instance.First(&product, productId)
+
+	if result.Error != nil {
+		return models.Product{}, result.Error
 	}
+
+	return product, nil
+}
+
+func ListProducts() ([]models.Product, error) {
+	var products []models.Product
+
+	result := database.Instance.Find(&products)
 
 	if result.Error != nil {
 		return []models.Product{}, result.Error

@@ -83,7 +83,7 @@ func UpdateUser(context *fiber.Ctx) error {
 }
 
 func ListUsers(context *fiber.Ctx) error {
-	var query QueryById
+	var query ListUsersQuery
 	err := context.QueryParser(&query)
 
 	if err != nil {
@@ -93,7 +93,7 @@ func ListUsers(context *fiber.Ctx) error {
 		})
 	}
 
-	users, err := services.ListUsers(query.Id)
+	user, err := services.GetUser(query.UserId)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{
@@ -103,12 +103,12 @@ func ListUsers(context *fiber.Ctx) error {
 	}
 
 	return context.Status(fiber.StatusOK).JSON(ListUsersResponse{
-		Users: users,
+		Users: []models.User{user},
 	})
 }
 
 func DeleteUser(context *fiber.Ctx) error {
-	var query QueryById
+	var query DeleteUserQuery
 	err := context.QueryParser(&query)
 
 	if err != nil {
@@ -118,7 +118,7 @@ func DeleteUser(context *fiber.Ctx) error {
 		})
 	}
 
-	err = services.DeleteUser(query.Id)
+	err = services.DeleteUser(query.UserId)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{

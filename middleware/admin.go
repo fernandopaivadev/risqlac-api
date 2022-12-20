@@ -11,7 +11,7 @@ func VerifyAdmin(context *fiber.Ctx) error {
 	if isAdmin {
 		return context.Next()
 	} else {
-		return context.Status(fiber.StatusForbidden).JSON(ErrorResponse{
+		return context.Status(fiber.StatusForbidden).JSON(MessageResponse{
 			Message: "User is not admin",
 		})
 	}
