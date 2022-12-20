@@ -3,17 +3,17 @@ package main
 import (
 	"risqlac-api/controllers"
 	"risqlac-api/database"
+	"risqlac-api/environment"
 	"risqlac-api/middleware"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	godotenv.Load()
+	environment.Setup()
 	database.Setup()
 
 	app := fiber.New()
@@ -36,7 +36,6 @@ func main() {
 	)
 	userRoutes.Post(
 		"/create",
-		middleware.ValidateToken,
 		controllers.CreateUser,
 	)
 	userRoutes.Put(
