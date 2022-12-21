@@ -1,10 +1,19 @@
-package controllers
+package types
 
 import "risqlac-api/models"
 
 type ErrorResponse struct {
 	Message string `json:"message"`
 	Error   string `json:"error"`
+}
+
+type MessageResponse struct {
+	Message string `json:"message"`
+}
+
+type TokenClaims struct {
+	User_Id    uint64 `json:"user_id"`
+	Expires_at uint64 `json:"expires_at"`
 }
 
 type SuccessResponse struct {
@@ -32,7 +41,7 @@ type ListUsersQuery struct {
 	UserId uint64 `json:"user_id"`
 }
 
-type ListProdcutsQuery struct {
+type ListProductsQuery struct {
 	ProductId uint64 `json:"product_id"`
 }
 
@@ -40,6 +49,6 @@ type DeleteUserQuery struct {
 	UserId uint64 `json:"user_id"`
 }
 
-type DeleteProdcutQuery struct {
+type DeleteProductsQuery struct {
 	ProductId uint64 `json:"product_id"`
 }

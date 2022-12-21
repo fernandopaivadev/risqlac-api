@@ -8,9 +8,6 @@ import (
 	"gorm.io/gorm"
 )
 
-var Users []models.User
-var Products []models.Product
-
 var Instance *gorm.DB
 
 func Setup() {
