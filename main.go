@@ -14,7 +14,7 @@ import (
 
 func main() {
 	environment.Load()
-	database.Setup()
+	database.Connect()
 
 	app := fiber.New()
 

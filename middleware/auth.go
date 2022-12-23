@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"encoding/json"
 	"fmt"
 	"risqlac-api/services"
 	"risqlac-api/types"
@@ -12,33 +11,16 @@ import (
 func ValidateToken(context *fiber.Ctx) error {
 	headers := context.GetReqHeaders()
 	tokenString := headers["Authorization"]
-	isValid, claims, err := services.ValidateUserToken(tokenString)
+	claims, err := services.ParseUserToken(tokenString)
 
 	if err != nil {
 		return context.Status(fiber.StatusUnauthorized).JSON(types.ErrorResponse{
-			Message: "Error parsing token",
+			Message: "Error validating token",
 			Error:   err.Error(),
 		})
 	}
 
-	if !isValid {
-		return context.Status(fiber.StatusUnauthorized).JSON(types.MessageResponse{
-			Message: "Invalid token",
-		})
-	}
-
-	var claimsObject types.TokenClaims
-	claimsJSON, _ := json.Marshal(claims)
-	err = json.Unmarshal(claimsJSON, &claimsObject)
-
-	if err != nil {
-		return context.Status(fiber.StatusUnauthorized).JSON(types.ErrorResponse{
-			Message: "Error parsing claims",
-			Error:   err.Error(),
-		})
-	}
-
-	user, err := services.GetUser(claimsObject.User_Id)
+	user, err := services.GetUser(claims.User_id)
 
 	if err != nil {
 		return context.Status(fiber.StatusUnauthorized).JSON(types.ErrorResponse{

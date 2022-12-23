@@ -1,7 +1,7 @@
 package database
 
 import (
-	"os"
+	"risqlac-api/environment"
 	"risqlac-api/models"
 
 	"gorm.io/driver/sqlite"
@@ -10,8 +10,8 @@ import (
 
 var Instance *gorm.DB
 
-func Setup() {
-	db, err := gorm.Open(sqlite.Open(os.Getenv("DATABASE_FILE")), &gorm.Config{})
+func Connect() {
+	db, err := gorm.Open(sqlite.Open(environment.Get().DATABASE_FILE), &gorm.Config{})
 
 	if err != nil {
 		panic("Failed to connect database")

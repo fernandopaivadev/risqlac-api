@@ -1,10 +1,11 @@
 package services
 
 import (
-	"os"
+	"encoding/json"
 	"risqlac-api/database"
+	"risqlac-api/environment"
 	"risqlac-api/models"
-
+	"risqlac-api/types"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -38,7 +39,7 @@ func GenerateUserToken(email string, password string) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+	tokenString, err := token.SignedString([]byte(environment.Get().JWT_SECRET))
 
 	if err != nil {
 		return "", nil
@@ -47,23 +48,29 @@ func GenerateUserToken(email string, password string) (string, error) {
 	return tokenString, nil
 }
 
-func ValidateUserToken(tokenString string) (bool, jwt.MapClaims, error) {
-	JWT_SECRET := os.Getenv("JWT_SECRET")
-
+func ParseUserToken(tokenString string) (types.TokenClaims, error) {
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
-		return []byte(JWT_SECRET), nil
+		return []byte(environment.Get().JWT_SECRET), nil
 	})
 
 	if err != nil {
-		return false, nil, err
+		return types.TokenClaims{}, err
 	}
 
-	if token.Valid {
-		claims, _ := token.Claims.(jwt.MapClaims)
-		return true, claims, nil
+	if !token.Valid {
+		return types.TokenClaims{}, types.MakeCustomError("Invalid token")
 	}
 
-	return false, nil, nil
+	jwtClaims, _ := token.Claims.(jwt.MapClaims)
+	var claimsObject types.TokenClaims
+	claimsJSON, _ := json.Marshal(jwtClaims)
+	err = json.Unmarshal(claimsJSON, &claimsObject)
+
+	if err != nil {
+		return types.TokenClaims{}, err
+	}
+
+	return claimsObject, nil
 }
 
 func CreateUser(user models.User) error {
