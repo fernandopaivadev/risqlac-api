@@ -94,7 +94,29 @@ func ListUsers(context *fiber.Ctx) error {
 		})
 	}
 
-	user, err := services.GetUser(query.UserId)
+	var users []models.User
+
+	if query.UserId != 0 {
+		user, err := services.GetUser(query.UserId)
+
+		if err != nil {
+			return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
+				Message: "Error retrieving user",
+				Error:   err.Error(),
+			})
+		}
+
+		users = append(users, user)
+	} else {
+		users, err = services.ListUsers()
+
+		if err != nil {
+			return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
+				Message: "Error retrieving users",
+				Error:   err.Error(),
+			})
+		}
+	}
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -104,7 +126,7 @@ func ListUsers(context *fiber.Ctx) error {
 	}
 
 	return context.Status(fiber.StatusOK).JSON(types.ListUsersResponse{
-		Users: []models.User{user},
+		Users: users,
 	})
 }
 

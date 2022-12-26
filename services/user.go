@@ -73,6 +73,27 @@ func ParseUserToken(tokenString string) (types.TokenClaims, error) {
 	return claimsObject, nil
 }
 
+func ResetUserPassword(userId uint64, newPassword string) error {
+	passwordHash, err := bcrypt.GenerateFromPassword(
+		[]byte(newPassword),
+		bcrypt.DefaultCost,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	result := database.Instance.Model(&models.User{}).Updates(models.User{
+		Password: string(passwordHash),
+	}).Where("id", userId)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
 func CreateUser(user models.User) error {
 	passwordHash, err := bcrypt.GenerateFromPassword(
 		[]byte(user.Password),

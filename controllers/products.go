@@ -69,7 +69,29 @@ func ListProducts(context *fiber.Ctx) error {
 		})
 	}
 
-	product, err := services.GetProduct(query.ProductId)
+	var products []models.Product
+
+	if query.ProductId != 0 {
+		product, err := services.GetProduct(query.ProductId)
+
+		if err != nil {
+			return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
+				Message: "Error retrieving product",
+				Error:   err.Error(),
+			})
+		}
+
+		products = append(products, product)
+	} else {
+		products, err = services.ListProducts()
+
+		if err != nil {
+			return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
+				Message: "Error retrieving products",
+				Error:   err.Error(),
+			})
+		}
+	}
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -79,7 +101,7 @@ func ListProducts(context *fiber.Ctx) error {
 	}
 
 	return context.Status(fiber.StatusOK).JSON(types.ListProductsResponse{
-		Products: []models.Product{product},
+		Products: products,
 	})
 }
 
