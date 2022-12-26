@@ -1,0 +1,26 @@
+{
+	"editor.fontFamily": "Fira Code",
+	"editor.fontLigatures": true,
+	"editor.fontSize": 14,
+
+	"editor.formatOnSave": true,
+	"editor.renderWhitespace": "boundary",
+	"editor.linkedEditing": true,
+
+	"editor.cursorStyle": "block",
+	"editor.cursorBlinking": "smooth",
+	"editor.cursorSmoothCaretAnimation": true,
+
+	"explorer.sortOrder": "type",
+	"files.autoSave": "onFocusChange",
+
+	"workbench.editor.highlightModifiedTabs": true,
+	"workbench.activityBar.visible": false,
+	"workbench.list.openMode": "singleClick",
+	"editor.rulers": [
+		{
+			"column": 80,
+			"color": "#0055aa"
+		}
+	]
+}
