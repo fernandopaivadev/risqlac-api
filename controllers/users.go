@@ -61,8 +61,8 @@ func CreateUser(context *fiber.Ctx) error {
 
 func UpdateUser(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
-	isAdmin := requestHeaders["is_admin"] == "true"
-	loggedUserId := requestHeaders["user_id"]
+	isAdmin := requestHeaders["Is_admin"] == "true"
+	loggedUserId := requestHeaders["User_id"]
 
 	var user models.User
 	err := context.BodyParser(&user)
@@ -96,8 +96,8 @@ func UpdateUser(context *fiber.Ctx) error {
 
 func ListUsers(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
-	isAdmin := requestHeaders["is_admin"] == "true"
-	loggedUserId := requestHeaders["user_id"]
+	isAdmin := requestHeaders["Is_admin"] == "true"
+	loggedUserId := requestHeaders["User_id"]
 
 	var query types.ListUsersQuery
 	err := context.QueryParser(&query)

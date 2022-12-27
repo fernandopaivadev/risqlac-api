@@ -29,8 +29,8 @@ func ValidateToken(context *fiber.Ctx) error {
 		})
 	}
 
-	context.Request().Header.Add("user_id", fmt.Sprint(user.Id))
-	context.Request().Header.Add("is_admin", fmt.Sprint(user.Is_admin))
+	context.Request().Header.Add("User_id", fmt.Sprint(user.Id))
+	context.Request().Header.Add("Is_admin", fmt.Sprint(user.Is_admin))
 
 	return context.Next()
 }

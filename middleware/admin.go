@@ -8,7 +8,7 @@ import (
 
 func VerifyAdmin(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
-	isAdmin := requestHeaders["is_admin"] == "true"
+	isAdmin := requestHeaders["Is_admin"] == "true"
 
 	if isAdmin {
 		return context.Next()
