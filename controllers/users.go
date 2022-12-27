@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"risqlac-api/models"
 	"risqlac-api/services"
 	"risqlac-api/types"
@@ -8,7 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func UserAuth(context *fiber.Ctx) error {
+func UserLogin(context *fiber.Ctx) error {
 	var query types.UserAuthQuery
 	err := context.QueryParser(&query)
 
@@ -59,6 +60,10 @@ func CreateUser(context *fiber.Ctx) error {
 }
 
 func UpdateUser(context *fiber.Ctx) error {
+	requestHeaders := context.GetReqHeaders()
+	isAdmin := requestHeaders["is_admin"] == "true"
+	loggedUserId := requestHeaders["user_id"]
+
 	var user models.User
 	err := context.BodyParser(&user)
 
@@ -66,6 +71,12 @@ func UpdateUser(context *fiber.Ctx) error {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
 			Message: "Error parsing body params",
 			Error:   err.Error(),
+		})
+	}
+
+	if !(isAdmin || loggedUserId == fmt.Sprint(user.Id)) {
+		return context.Status(fiber.StatusForbidden).JSON(types.MessageResponse{
+			Message: "User is not admin",
 		})
 	}
 
@@ -84,6 +95,10 @@ func UpdateUser(context *fiber.Ctx) error {
 }
 
 func ListUsers(context *fiber.Ctx) error {
+	requestHeaders := context.GetReqHeaders()
+	isAdmin := requestHeaders["is_admin"] == "true"
+	loggedUserId := requestHeaders["user_id"]
+
 	var query types.ListUsersQuery
 	err := context.QueryParser(&query)
 
@@ -91,6 +106,12 @@ func ListUsers(context *fiber.Ctx) error {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
 			Message: "Error parsing query params",
 			Error:   err.Error(),
+		})
+	}
+
+	if !(isAdmin || loggedUserId == fmt.Sprint(query.UserId)) {
+		return context.Status(fiber.StatusForbidden).JSON(types.MessageResponse{
+			Message: "User is not admin",
 		})
 	}
 

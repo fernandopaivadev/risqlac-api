@@ -31,8 +31,8 @@ func main() {
 
 	userRoutes := app.Group("/user")
 	userRoutes.Get(
-		"/auth",
-		controllers.UserAuth,
+		"/login",
+		controllers.UserLogin,
 	)
 	userRoutes.Post(
 		"/create",
@@ -40,19 +40,18 @@ func main() {
 	)
 	userRoutes.Put(
 		"/update",
-		// middleware.ValidateToken,
+		middleware.ValidateToken,
 		controllers.UpdateUser,
 	)
 	userRoutes.Get(
 		"/list",
-		// middleware.ValidateToken,
-		// middleware.VerifyAdmin,
+		middleware.ValidateToken,
 		controllers.ListUsers,
 	)
 	userRoutes.Delete(
 		"/delete",
-		// middleware.ValidateToken,
-		// middleware.VerifyAdmin,
+		middleware.ValidateToken,
+		middleware.VerifyAdmin,
 		controllers.DeleteUser,
 	)
 
@@ -60,11 +59,13 @@ func main() {
 	productRoutes.Post(
 		"/create",
 		middleware.ValidateToken,
+		middleware.VerifyAdmin,
 		controllers.CreateProduct,
 	)
 	productRoutes.Put(
 		"/update",
 		middleware.ValidateToken,
+		middleware.VerifyAdmin,
 		controllers.UpdateProduct,
 	)
 	productRoutes.Get(
@@ -75,6 +76,7 @@ func main() {
 	productRoutes.Delete(
 		"/delete",
 		middleware.ValidateToken,
+		middleware.VerifyAdmin,
 		controllers.DeleteProduct,
 	)
 
