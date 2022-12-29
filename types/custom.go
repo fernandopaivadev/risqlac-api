@@ -56,18 +56,6 @@ type ListProductsResponse struct {
 	Products []models.Product `json:"products"`
 }
 
-type ListUsersQuery struct {
-	UserId uint64 `json:"user_id"`
-}
-
-type ListProductsQuery struct {
-	ProductId uint64 `json:"product_id"`
-}
-
-type DeleteUserQuery struct {
-	UserId uint64 `json:"user_id"`
-}
-
-type DeleteProductsQuery struct {
-	ProductId uint64 `json:"product_id"`
+type QueryById struct {
+	Id uint64 `json:"id"`
 }

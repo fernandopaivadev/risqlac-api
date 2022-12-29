@@ -66,7 +66,7 @@ func UpdateUser(context *fiber.Ctx) error {
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
-			Message: "Error parsing token userId",
+			Message: "Error parsing token user id",
 			Error:   err.Error(),
 		})
 	}
@@ -83,7 +83,7 @@ func UpdateUser(context *fiber.Ctx) error {
 
 	if !(isAdmin || loggedUserId == user.Id) {
 		return context.Status(fiber.StatusForbidden).JSON(types.MessageResponse{
-			Message: "User is not admin",
+			Message: "Not allowed for no admin users",
 		})
 	}
 
@@ -108,12 +108,12 @@ func ListUsers(context *fiber.Ctx) error {
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
-			Message: "Error parsing token userId",
+			Message: "Error parsing token user id",
 			Error:   err.Error(),
 		})
 	}
 
-	var query types.ListUsersQuery
+	var query types.QueryById
 	err = context.QueryParser(&query)
 
 	if err != nil {
@@ -126,8 +126,8 @@ func ListUsers(context *fiber.Ctx) error {
 	var users []models.User
 
 	if isAdmin {
-		if query.UserId != 0 {
-			user, err := services.GetUser(query.UserId)
+		if query.Id != 0 {
+			user, err := services.GetUser(query.Id)
 
 			if err != nil {
 				return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -179,12 +179,12 @@ func DeleteUser(context *fiber.Ctx) error {
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
-			Message: "Error parsing token userId",
+			Message: "Error parsing token user id",
 			Error:   err.Error(),
 		})
 	}
 
-	var query types.DeleteUserQuery
+	var query types.QueryById
 	err = context.QueryParser(&query)
 
 	if err != nil {
@@ -194,13 +194,13 @@ func DeleteUser(context *fiber.Ctx) error {
 		})
 	}
 
-	if !(isAdmin || loggedUserId == query.UserId) {
+	if !(isAdmin || loggedUserId == query.Id) {
 		return context.Status(fiber.StatusForbidden).JSON(types.MessageResponse{
-			Message: "User is not admin",
+			Message: "Not allowed for no admin users",
 		})
 	}
 
-	err = services.DeleteUser(query.UserId)
+	err = services.DeleteUser(query.Id)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{

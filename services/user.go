@@ -123,6 +123,7 @@ func UpdateUser(user models.User) error {
 		Username: user.Username,
 		Email:    user.Email,
 		Phone:    user.Phone,
+		Is_admin: user.Is_admin,
 	})
 
 	if result.Error != nil {

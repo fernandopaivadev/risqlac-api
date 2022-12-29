@@ -16,27 +16,28 @@ func main() {
 	environment.Load()
 	database.Connect()
 
-	app := fiber.New()
+	App := fiber.New()
 
-	app.Use(logger.New())
-	app.Use(requestid.New())
+	App.Use(logger.New())
+	App.Use(requestid.New())
 
-	app.Use(cors.New(cors.Config{
+	App.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
 		AllowMethods: "GET,POST,HEAD,PUT,DELETE,PATCH,OPTIONS",
 	}))
 
-	app.Get("/info", func(context *fiber.Ctx) error {
+	App.Get("/info", func(context *fiber.Ctx) error {
 		return context.Status(fiber.StatusOK).SendString("RisQLAC API v1.0")
 	})
 
-	userRoutes := app.Group("/user")
+	userRoutes := App.Group("/user")
 	userRoutes.Get(
 		"/login",
 		controllers.UserLogin,
 	)
 	userRoutes.Post(
 		"/create",
+		middleware.VerifyAdmin,
 		controllers.CreateUser,
 	)
 	userRoutes.Put(
@@ -52,11 +53,10 @@ func main() {
 	userRoutes.Delete(
 		"/delete",
 		middleware.ValidateToken,
-		middleware.VerifyAdmin,
 		controllers.DeleteUser,
 	)
 
-	productRoutes := app.Group("/product")
+	productRoutes := App.Group("/product")
 	productRoutes.Post(
 		"/create",
 		middleware.ValidateToken,
@@ -81,7 +81,7 @@ func main() {
 		controllers.DeleteProduct,
 	)
 
-	err := app.Listen(":3000")
+	err := App.Listen(":3000")
 
 	if err != nil {
 		panic("Error starting server: " + err.Error())

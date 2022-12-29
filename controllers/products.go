@@ -59,7 +59,7 @@ func UpdateProduct(context *fiber.Ctx) error {
 }
 
 func ListProducts(context *fiber.Ctx) error {
-	var query types.ListProductsQuery
+	var query types.QueryById
 	err := context.QueryParser(&query)
 
 	if err != nil {
@@ -71,8 +71,8 @@ func ListProducts(context *fiber.Ctx) error {
 
 	var products []models.Product
 
-	if query.ProductId != 0 {
-		product, err := services.GetProduct(query.ProductId)
+	if query.Id != 0 {
+		product, err := services.GetProduct(query.Id)
 
 		if err != nil {
 			return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -106,7 +106,7 @@ func ListProducts(context *fiber.Ctx) error {
 }
 
 func DeleteProduct(context *fiber.Ctx) error {
-	var query types.DeleteProductsQuery
+	var query types.QueryById
 	err := context.QueryParser(&query)
 
 	if err != nil {
@@ -116,7 +116,7 @@ func DeleteProduct(context *fiber.Ctx) error {
 		})
 	}
 
-	err = services.DeleteProduct(query.ProductId)
+	err = services.DeleteProduct(query.Id)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
