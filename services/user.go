@@ -15,9 +15,9 @@ import (
 func GenerateUserToken(email string, password string) (string, error) {
 	var user models.User
 
-	result := database.Instance.First(&user).Where(models.User{
+	result := database.Instance.Where(&models.User{
 		Email: email,
-	})
+	}).First(&user)
 
 	if result.Error != nil {
 		return "", result.Error
@@ -83,9 +83,11 @@ func ResetUserPassword(userId uint64, newPassword string) error {
 		return err
 	}
 
-	result := database.Instance.Model(&models.User{}).Updates(models.User{
+	result := database.Instance.Model(&models.User{
+		Id: userId,
+	}).Updates(models.User{
 		Password: string(passwordHash),
-	}).Where("id", userId)
+	})
 
 	if result.Error != nil {
 		return result.Error
@@ -121,7 +123,7 @@ func UpdateUser(user models.User) error {
 		Username: user.Username,
 		Email:    user.Email,
 		Phone:    user.Phone,
-	}).Where("id", user.Id)
+	})
 
 	if result.Error != nil {
 		return result.Error

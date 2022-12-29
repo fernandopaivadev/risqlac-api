@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"fmt"
 	"risqlac-api/models"
 	"risqlac-api/services"
 	"risqlac-api/types"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -62,10 +62,17 @@ func CreateUser(context *fiber.Ctx) error {
 func UpdateUser(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
 	isAdmin := requestHeaders["Is_admin"] == "true"
-	loggedUserId := requestHeaders["User_id"]
+	loggedUserId, err := strconv.ParseUint(requestHeaders["User_id"], 10, 64)
+
+	if err != nil {
+		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
+			Message: "Error parsing token userId",
+			Error:   err.Error(),
+		})
+	}
 
 	var user models.User
-	err := context.BodyParser(&user)
+	err = context.BodyParser(&user)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -74,7 +81,7 @@ func UpdateUser(context *fiber.Ctx) error {
 		})
 	}
 
-	if !(isAdmin || loggedUserId == fmt.Sprint(user.Id)) {
+	if !(isAdmin || loggedUserId == user.Id) {
 		return context.Status(fiber.StatusForbidden).JSON(types.MessageResponse{
 			Message: "User is not admin",
 		})
@@ -97,10 +104,17 @@ func UpdateUser(context *fiber.Ctx) error {
 func ListUsers(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
 	isAdmin := requestHeaders["Is_admin"] == "true"
-	loggedUserId := requestHeaders["User_id"]
+	loggedUserId, err := strconv.ParseUint(requestHeaders["User_id"], 10, 64)
+
+	if err != nil {
+		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
+			Message: "Error parsing token userId",
+			Error:   err.Error(),
+		})
+	}
 
 	var query types.ListUsersQuery
-	err := context.QueryParser(&query)
+	err = context.QueryParser(&query)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -109,16 +123,32 @@ func ListUsers(context *fiber.Ctx) error {
 		})
 	}
 
-	if !(isAdmin || loggedUserId == fmt.Sprint(query.UserId)) {
-		return context.Status(fiber.StatusForbidden).JSON(types.MessageResponse{
-			Message: "User is not admin",
-		})
-	}
-
 	var users []models.User
 
-	if query.UserId != 0 {
-		user, err := services.GetUser(query.UserId)
+	if isAdmin {
+		if query.UserId != 0 {
+			user, err := services.GetUser(query.UserId)
+
+			if err != nil {
+				return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
+					Message: "Error retrieving user",
+					Error:   err.Error(),
+				})
+			}
+
+			users = append(users, user)
+		} else {
+			users, err = services.ListUsers()
+
+			if err != nil {
+				return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
+					Message: "Error retrieving users",
+					Error:   err.Error(),
+				})
+			}
+		}
+	} else {
+		user, err := services.GetUser(loggedUserId)
 
 		if err != nil {
 			return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -128,15 +158,6 @@ func ListUsers(context *fiber.Ctx) error {
 		}
 
 		users = append(users, user)
-	} else {
-		users, err = services.ListUsers()
-
-		if err != nil {
-			return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
-				Message: "Error retrieving users",
-				Error:   err.Error(),
-			})
-		}
 	}
 
 	if err != nil {
@@ -152,13 +173,30 @@ func ListUsers(context *fiber.Ctx) error {
 }
 
 func DeleteUser(context *fiber.Ctx) error {
+	requestHeaders := context.GetReqHeaders()
+	isAdmin := requestHeaders["Is_admin"] == "true"
+	loggedUserId, err := strconv.ParseUint(requestHeaders["User_id"], 10, 64)
+
+	if err != nil {
+		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
+			Message: "Error parsing token userId",
+			Error:   err.Error(),
+		})
+	}
+
 	var query types.DeleteUserQuery
-	err := context.QueryParser(&query)
+	err = context.QueryParser(&query)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
 			Message: "Error parsing query params",
 			Error:   err.Error(),
+		})
+	}
+
+	if !(isAdmin || loggedUserId == query.UserId) {
+		return context.Status(fiber.StatusForbidden).JSON(types.MessageResponse{
+			Message: "User is not admin",
 		})
 	}
 
