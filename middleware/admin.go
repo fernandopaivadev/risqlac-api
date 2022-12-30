@@ -10,11 +10,11 @@ func VerifyAdmin(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
 	isAdmin := requestHeaders["Is_admin"] == "true"
 
-	if isAdmin {
-		return context.Next()
-	} else {
+	if !isAdmin {
 		return context.Status(fiber.StatusForbidden).JSON(types.MessageResponse{
-			Message: "User is not admin",
+			Message: "Not allowed for no admin users",
 		})
 	}
+
+	return context.Next()
 }

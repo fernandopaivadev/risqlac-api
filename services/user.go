@@ -118,7 +118,7 @@ func CreateUser(user models.User) error {
 }
 
 func UpdateUser(user models.User) error {
-	result := database.Instance.Model(&user).Updates(models.User{
+	result := database.Instance.Model(&user).Select("*").Updates(models.User{
 		Name:     user.Name,
 		Username: user.Username,
 		Email:    user.Email,

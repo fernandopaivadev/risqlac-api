@@ -16,7 +16,7 @@ func CreateProduct(product models.Product) error {
 }
 
 func UpdateProduct(user models.Product) error {
-	result := database.Instance.Model(&user).Updates(models.Product{
+	result := database.Instance.Model(&user).Select("*").Updates(models.Product{
 		Name:            user.Name,
 		Synonym:         user.Synonym,
 		Class:           user.Class,
