@@ -37,7 +37,7 @@ func main() {
 	)
 	userRoutes.Post(
 		"/create",
-		middleware.VerifyAdmin,
+		middleware.ValidateToken,
 		controllers.CreateUser,
 	)
 	userRoutes.Put(

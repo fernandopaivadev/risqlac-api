@@ -35,6 +35,9 @@ func UserLogin(context *fiber.Ctx) error {
 }
 
 func CreateUser(context *fiber.Ctx) error {
+	requestHeaders := context.GetReqHeaders()
+	isAdmin := requestHeaders["Is_admin"] == "true"
+
 	var user models.User
 	err := context.BodyParser(&user)
 
@@ -43,6 +46,10 @@ func CreateUser(context *fiber.Ctx) error {
 			Message: "Error parsing body params",
 			Error:   err.Error(),
 		})
+	}
+
+	if !isAdmin {
+		user.Is_admin = false
 	}
 
 	err = services.CreateUser(user)
