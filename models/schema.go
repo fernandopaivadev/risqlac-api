@@ -5,7 +5,7 @@ import (
 )
 
 type User struct {
-	Id         uint64    `json:"id" gorm:"unique; autoIncrement; primaryKey"`
+	Id         uint64    `json:"id" gorm:"unique; autoIncrement; primaryKey; <-:create"`
 	Username   string    `json:"username" gorm:"unique"`
 	Email      string    `json:"email" gorm:"unique"`
 	Name       string    `json:"name"`
@@ -17,7 +17,7 @@ type User struct {
 }
 
 type Product struct {
-	Id              uint64    `json:"id" gorm:"autoIncrement; primaryKey"`
+	Id              uint64    `json:"id" gorm:"autoIncrement; primaryKey; <-:create"`
 	Synonym         string    `json:"synonym"`
 	Class           string    `json:"class"`
 	Subclass        string    `json:"subclass"`
