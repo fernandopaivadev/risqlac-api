@@ -3,7 +3,7 @@ module risqlac-api
 go 1.19
 
 require (
-	github.com/gofiber/fiber/v2 v2.40.1
+	github.com/gofiber/fiber/v2 v2.41.0
 	github.com/golang-jwt/jwt/v4 v4.4.3
 	golang.org/x/crypto v0.4.0
 	gorm.io/driver/sqlite v1.4.4
@@ -18,7 +18,7 @@ require (
 
 require (
 	github.com/andybalholm/brotli v1.0.4 // indirect
-	github.com/klauspost/compress v1.15.13 // indirect
+	github.com/klauspost/compress v1.15.14 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/mattn/go-runewidth v0.0.14 // indirect
