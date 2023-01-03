@@ -34,6 +34,83 @@ func UserLogin(context *fiber.Ctx) error {
 	})
 }
 
+func RequestPasswordChange(context *fiber.Ctx) error {
+	var query types.RequestPasswordChangeQuery
+	err := context.QueryParser(&query)
+
+	if err != nil {
+		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
+			Message: "Error parsing query params",
+			Error:   err.Error(),
+		})
+	}
+
+	user, err := services.GetUserByEmail(query.Email)
+
+	if err != nil {
+		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
+			Message: "Error retrieving user",
+			Error:   err.Error(),
+		})
+	}
+
+	token, err := services.GeneratePasswordChangeToken(user.Email)
+
+	if err != nil {
+		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
+			Message: "Error generating password change token",
+			Error:   err.Error(),
+		})
+	}
+
+	go services.SendEmail(
+		user.Name,
+		user.Email,
+		"RECUPERAÇÃO DE SENHA",
+		"TOKEN DE RECUPERAÇÃO: "+token,
+		"",
+	)
+
+	return context.Status(fiber.StatusAccepted).JSON(types.SuccessResponse{
+		Message: "Password recovery email sent",
+	})
+}
+
+func ChangePassword(context *fiber.Ctx) error {
+	requestHeaders := context.GetReqHeaders()
+	tokenUserId, err := strconv.ParseUint(requestHeaders["User_id"], 10, 64)
+
+	if err != nil {
+		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
+			Message: "Error parsing token user id",
+			Error:   err.Error(),
+		})
+	}
+
+	var query types.ChangePasswordQuery
+	err = context.QueryParser(&query)
+
+	if err != nil {
+		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
+			Message: "Error parsing query params",
+			Error:   err.Error(),
+		})
+	}
+
+	err = services.ChangeUserPassword(tokenUserId, query.Password)
+
+	if err != nil {
+		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
+			Message: "Error changing user password",
+			Error:   err.Error(),
+		})
+	}
+
+	return context.Status(fiber.StatusOK).JSON(types.SuccessResponse{
+		Message: "User password changed",
+	})
+}
+
 func CreateUser(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
 	isAdmin := requestHeaders["Is_admin"] == "true"
@@ -69,7 +146,7 @@ func CreateUser(context *fiber.Ctx) error {
 func UpdateUser(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
 	isAdmin := requestHeaders["Is_admin"] == "true"
-	loggedUserId, err := strconv.ParseUint(requestHeaders["User_id"], 10, 64)
+	tokenUserId, err := strconv.ParseUint(requestHeaders["User_id"], 10, 64)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -88,7 +165,7 @@ func UpdateUser(context *fiber.Ctx) error {
 		})
 	}
 
-	if !(isAdmin || loggedUserId == user.Id) {
+	if !(isAdmin || tokenUserId == user.Id) {
 		return context.Status(fiber.StatusForbidden).JSON(types.MessageResponse{
 			Message: "Not allowed for no admin users",
 		})
@@ -111,7 +188,7 @@ func UpdateUser(context *fiber.Ctx) error {
 func ListUsers(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
 	isAdmin := requestHeaders["Is_admin"] == "true"
-	loggedUserId, err := strconv.ParseUint(requestHeaders["User_id"], 10, 64)
+	tokenUserId, err := strconv.ParseUint(requestHeaders["User_id"], 10, 64)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -134,7 +211,7 @@ func ListUsers(context *fiber.Ctx) error {
 
 	if isAdmin {
 		if query.Id != 0 {
-			user, err := services.GetUser(query.Id)
+			user, err := services.GetUserById(query.Id)
 
 			if err != nil {
 				return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -155,7 +232,7 @@ func ListUsers(context *fiber.Ctx) error {
 			}
 		}
 	} else {
-		user, err := services.GetUser(loggedUserId)
+		user, err := services.GetUserById(tokenUserId)
 
 		if err != nil {
 			return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -182,7 +259,7 @@ func ListUsers(context *fiber.Ctx) error {
 func DeleteUser(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
 	isAdmin := requestHeaders["Is_admin"] == "true"
-	loggedUserId, err := strconv.ParseUint(requestHeaders["User_id"], 10, 64)
+	tokenUserId, err := strconv.ParseUint(requestHeaders["User_id"], 10, 64)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -201,7 +278,7 @@ func DeleteUser(context *fiber.Ctx) error {
 		})
 	}
 
-	if !(isAdmin || loggedUserId == query.Id) {
+	if !(isAdmin || tokenUserId == query.Id) {
 		return context.Status(fiber.StatusForbidden).JSON(types.MessageResponse{
 			Message: "Not allowed for no admin users",
 		})

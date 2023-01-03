@@ -20,7 +20,7 @@ func ValidateToken(context *fiber.Ctx) error {
 		})
 	}
 
-	user, err := services.GetUser(claims.User_id)
+	user, err := services.GetUserById(claims.User_id)
 
 	if err != nil {
 		return context.Status(fiber.StatusUnauthorized).JSON(types.ErrorResponse{

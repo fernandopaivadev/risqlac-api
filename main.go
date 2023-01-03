@@ -35,6 +35,15 @@ func main() {
 		"/login",
 		controllers.UserLogin,
 	)
+	userRoutes.Get(
+		"/request-password-change",
+		controllers.RequestPasswordChange,
+	)
+	userRoutes.Get(
+		"/change-password",
+		middleware.ValidateToken,
+		controllers.ChangePassword,
+	)
 	userRoutes.Post(
 		"/create",
 		middleware.ValidateToken,

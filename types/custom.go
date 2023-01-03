@@ -11,14 +11,15 @@ func (err *customError) Error() string {
 }
 
 func MakeCustomError(message string) error {
-	var err *customError
-	err.Message = message
-	return err
+	return &customError{
+		Message: message,
+	}
 }
 
 type Env struct {
-	JWT_SECRET    string
-	DATABASE_FILE string
+	JWT_SECRET       string
+	DATABASE_FILE    string
+	SENDGRID_API_KEY string
 }
 
 type ErrorResponse struct {
@@ -58,4 +59,12 @@ type ListProductsResponse struct {
 
 type QueryById struct {
 	Id uint64 `json:"id"`
+}
+
+type RequestPasswordChangeQuery struct {
+	Email string `json:"email"`
+}
+
+type ChangePasswordQuery struct {
+	Password string `json:"password"`
 }

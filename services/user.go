@@ -15,15 +15,13 @@ import (
 func GenerateUserToken(email string, password string) (string, error) {
 	var user models.User
 
-	result := database.Instance.Where(&models.User{
-		Email: email,
-	}).First(&user)
+	user, err := GetUserByEmail(email)
 
-	if result.Error != nil {
-		return "", result.Error
+	if err != nil {
+		return "", err
 	}
 
-	err := bcrypt.CompareHashAndPassword(
+	err = bcrypt.CompareHashAndPassword(
 		[]byte(user.Password),
 		[]byte(password),
 	)
@@ -35,6 +33,31 @@ func GenerateUserToken(email string, password string) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id":    user.Id,
 		"expires_at": time.Now().Add(24 * time.Hour).Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	tokenString, err := token.SignedString([]byte(environment.Get().JWT_SECRET))
+
+	if err != nil {
+		return "", nil
+	}
+
+	return tokenString, nil
+}
+
+func GeneratePasswordChangeToken(email string) (string, error) {
+	var user models.User
+
+	user, err := GetUserByEmail(email)
+
+	if err != nil {
+		return "", err
+	}
+
+	claims := jwt.MapClaims{
+		"user_id":    user.Id,
+		"expires_at": time.Now().Add(5 * time.Minute).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -73,7 +96,7 @@ func ParseUserToken(tokenString string) (types.TokenClaims, error) {
 	return claimsObject, nil
 }
 
-func ResetUserPassword(userId uint64, newPassword string) error {
+func ChangeUserPassword(userId uint64, newPassword string) error {
 	passwordHash, err := bcrypt.GenerateFromPassword(
 		[]byte(newPassword),
 		bcrypt.DefaultCost,
@@ -133,10 +156,24 @@ func UpdateUser(user models.User) error {
 	return nil
 }
 
-func GetUser(userId uint64) (models.User, error) {
+func GetUserById(userId uint64) (models.User, error) {
 	var user models.User
 
 	result := database.Instance.First(&user, userId)
+
+	if result.Error != nil {
+		return models.User{}, result.Error
+	}
+
+	return user, nil
+}
+
+func GetUserByEmail(email string) (models.User, error) {
+	var user models.User
+
+	result := database.Instance.Where(&models.User{
+		Email: email,
+	}).First(&user)
 
 	if result.Error != nil {
 		return models.User{}, result.Error
