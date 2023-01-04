@@ -1,6 +1,7 @@
 package environment
 
 import (
+	"fmt"
 	"os"
 	"risqlac-api/types"
 
@@ -13,7 +14,9 @@ func Load() {
 	err := godotenv.Load()
 
 	if err != nil {
-		panic("Error loading environment variables")
+		fmt.Println(
+			"Error loading environment variables from .env file => " + err.Error(),
+		)
 	}
 
 	env.DATABASE_FILE = os.Getenv("DATABASE_FILE")
