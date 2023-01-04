@@ -8,7 +8,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var env types.Env
+var env types.EnvironmentVariables
 
 func Load() {
 	err := godotenv.Load()
@@ -24,6 +24,6 @@ func Load() {
 	env.SENDGRID_API_KEY = os.Getenv("SENDGRID_API_KEY")
 }
 
-func Get() types.Env {
+func Get() types.EnvironmentVariables {
 	return env
 }

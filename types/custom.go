@@ -16,7 +16,7 @@ func MakeCustomError(message string) error {
 	}
 }
 
-type Env struct {
+type EnvironmentVariables struct {
 	JWT_SECRET       string
 	DATABASE_FILE    string
 	SENDGRID_API_KEY string

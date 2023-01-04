@@ -14,7 +14,7 @@ func Connect() {
 	db, err := gorm.Open(sqlite.Open(environment.Get().DATABASE_FILE), &gorm.Config{})
 
 	if err != nil {
-		panic("Failed to connect database")
+		panic("Failed to connect to the database")
 	}
 
 	db.AutoMigrate(&models.User{})
