@@ -27,7 +27,7 @@ func main() {
 	}))
 
 	App.Get("/info", func(context *fiber.Ctx) error {
-		return context.Status(fiber.StatusOK).SendString("RisQLAC API v1.0")
+		return context.Status(fiber.StatusOK).SendString("RisQLAC API v2.0")
 	})
 
 	userRoutes := App.Group("/user")
