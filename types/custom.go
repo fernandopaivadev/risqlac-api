@@ -2,20 +2,6 @@ package types
 
 import "risqlac-api/models"
 
-type customError struct {
-	Message string
-}
-
-func (err *customError) Error() string {
-	return err.Message
-}
-
-func MakeCustomError(message string) error {
-	return &customError{
-		Message: message,
-	}
-}
-
 type EnvironmentVariables struct {
 	JWT_SECRET       string
 	DATABASE_FILE    string

@@ -1,8 +1,8 @@
 package services
 
 import (
+	"errors"
 	"risqlac-api/environment"
-	"risqlac-api/types"
 
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
@@ -33,5 +33,5 @@ func SendEmail(
 		return nil
 	}
 
-	return types.MakeCustomError("Email not sent")
+	return errors.New("email not sent")
 }

@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+	"errors"
 	"risqlac-api/database"
 	"risqlac-api/environment"
 	"risqlac-api/models"
@@ -81,7 +82,7 @@ func ParseUserToken(tokenString string) (types.TokenClaims, error) {
 	}
 
 	if !token.Valid {
-		return types.TokenClaims{}, types.MakeCustomError("Invalid token")
+		return types.TokenClaims{}, errors.New("invalid token")
 	}
 
 	jwtClaims, _ := token.Claims.(jwt.MapClaims)
