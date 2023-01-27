@@ -59,7 +59,7 @@ func UpdateProduct(context *fiber.Ctx) error {
 }
 
 func ListProducts(context *fiber.Ctx) error {
-	var query types.QueryById
+	var query types.ByIdRequest
 	err := context.QueryParser(&query)
 
 	if err != nil {
@@ -106,7 +106,7 @@ func ListProducts(context *fiber.Ctx) error {
 }
 
 func DeleteProduct(context *fiber.Ctx) error {
-	var query types.QueryById
+	var query types.ByIdRequest
 	err := context.QueryParser(&query)
 
 	if err != nil {

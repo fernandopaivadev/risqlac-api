@@ -22,8 +22,5 @@ func Load() {
 	env.DATABASE_FILE = os.Getenv("DATABASE_FILE")
 	env.JWT_SECRET = os.Getenv("JWT_SECRET")
 	env.SENDGRID_API_KEY = os.Getenv("SENDGRID_API_KEY")
-}
-
-func Get() types.EnvironmentVariables {
-	return env
+	env.SERVER_PORT = os.Getenv("SERVER_PORT")
 }

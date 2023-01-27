@@ -1,12 +1,13 @@
 package routes
 
 import (
+	"risqlac-api/app"
 	"risqlac-api/controllers"
 	"risqlac-api/middleware"
 )
 
-func Product() {
-	productRoutes := App.Group("/product")
+func SetupProductRoutes() {
+	productRoutes := app.Instance.Group("/product")
 
 	productRoutes.Post(
 		"/create",

@@ -1,12 +1,13 @@
 package routes
 
 import (
+	"risqlac-api/app"
 	"risqlac-api/controllers"
 	"risqlac-api/middleware"
 )
 
-func User() {
-	userRoutes := App.Group("/user")
+func SetupUserRoutes() {
+	userRoutes := app.Instance.Group("/user")
 
 	userRoutes.Get(
 		"/login",

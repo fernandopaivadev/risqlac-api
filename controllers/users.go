@@ -10,7 +10,7 @@ import (
 )
 
 func UserLogin(context *fiber.Ctx) error {
-	var query types.UserAuthQuery
+	var query types.UserAuthRequest
 	err := context.QueryParser(&query)
 
 	if err != nil {
@@ -35,7 +35,7 @@ func UserLogin(context *fiber.Ctx) error {
 }
 
 func RequestPasswordChange(context *fiber.Ctx) error {
-	var query types.RequestPasswordChangeQuery
+	var query types.RequestPasswordChangeRequest
 	err := context.QueryParser(&query)
 
 	if err != nil {
@@ -87,7 +87,7 @@ func ChangePassword(context *fiber.Ctx) error {
 		})
 	}
 
-	var query types.ChangePasswordQuery
+	var query types.ChangePasswordRequest
 	err = context.QueryParser(&query)
 
 	if err != nil {
@@ -197,7 +197,7 @@ func ListUsers(context *fiber.Ctx) error {
 		})
 	}
 
-	var query types.QueryById
+	var query types.ByIdRequest
 	err = context.QueryParser(&query)
 
 	if err != nil {
@@ -268,7 +268,7 @@ func DeleteUser(context *fiber.Ctx) error {
 		})
 	}
 
-	var query types.QueryById
+	var query types.ByIdRequest
 	err = context.QueryParser(&query)
 
 	if err != nil {

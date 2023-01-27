@@ -1,6 +1,7 @@
 package main
 
 import (
+	"risqlac-api/app"
 	"risqlac-api/database"
 	"risqlac-api/environment"
 	"risqlac-api/routes"
@@ -9,14 +10,8 @@ import (
 func main() {
 	environment.Load()
 	database.Connect()
-
-	routes.Setup()
-	routes.User()
-	routes.Product()
-
-	err := routes.App.Listen(":3000")
-
-	if err != nil {
-		panic("Error starting server: " + err.Error())
-	}
+	app.Setup()
+	routes.SetupUserRoutes()
+	routes.SetupProductRoutes()
+	app.Start()
 }
