@@ -9,7 +9,7 @@
 
 	"editor.cursorStyle": "block",
 	"editor.cursorBlinking": "smooth",
-	"editor.cursorSmoothCaretAnimation": true,
+	"editor.cursorSmoothCaretAnimation": "on",
 
 	"explorer.sortOrder": "type",
 	"files.autoSave": "onFocusChange",
