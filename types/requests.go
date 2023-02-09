@@ -1,18 +1,18 @@
 package types
 
 type UserAuthRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required"`
 }
 
 type ByIdRequest struct {
-	Id uint64 `json:"id"`
+	Id uint64 `json:"id" validate:"required"`
 }
 
 type RequestPasswordChangeRequest struct {
-	Email string `json:"email"`
+	Email string `json:"email" validate:"required"`
 }
 
 type ChangePasswordRequest struct {
-	Password string `json:"password"`
+	Password string `json:"password" validate:"required"`
 }

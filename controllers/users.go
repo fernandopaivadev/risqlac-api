@@ -20,6 +20,15 @@ func UserLogin(context *fiber.Ctx) error {
 		})
 	}
 
+	err = services.ValidateStruct(query)
+
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
+			Message: "Bad request",
+			Error:   err.Error(),
+		})
+	}
+
 	token, err := services.GenerateUserToken(query.Email, query.Password)
 
 	if err != nil {
@@ -41,6 +50,15 @@ func RequestPasswordChange(context *fiber.Ctx) error {
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
 			Message: "Error parsing query params",
+			Error:   err.Error(),
+		})
+	}
+
+	err = services.ValidateStruct(query)
+
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
+			Message: "Bad request",
 			Error:   err.Error(),
 		})
 	}
@@ -97,6 +115,15 @@ func ChangePassword(context *fiber.Ctx) error {
 		})
 	}
 
+	err = services.ValidateStruct(query)
+
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
+			Message: "Bad request",
+			Error:   err.Error(),
+		})
+	}
+
 	err = services.ChangeUserPassword(tokenUserId, query.Password)
 
 	if err != nil {
@@ -127,6 +154,15 @@ func CreateUser(context *fiber.Ctx) error {
 
 	if !isAdmin {
 		user.Is_admin = false
+	}
+
+	err = services.ValidateStruct(user)
+
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
+			Message: "Bad request",
+			Error:   err.Error(),
+		})
 	}
 
 	err = services.CreateUser(user)
@@ -171,6 +207,15 @@ func UpdateUser(context *fiber.Ctx) error {
 		})
 	}
 
+	err = services.ValidateStruct(user)
+
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
+			Message: "Bad request",
+			Error:   err.Error(),
+		})
+	}
+
 	err = services.UpdateUser(user)
 
 	if err != nil {
@@ -203,6 +248,15 @@ func ListUsers(context *fiber.Ctx) error {
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
 			Message: "Error parsing query params",
+			Error:   err.Error(),
+		})
+	}
+
+	err = services.ValidateStruct(query)
+
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
+			Message: "Bad request",
 			Error:   err.Error(),
 		})
 	}
@@ -281,6 +335,15 @@ func DeleteUser(context *fiber.Ctx) error {
 	if !(isAdmin || tokenUserId == query.Id) {
 		return context.Status(fiber.StatusForbidden).JSON(types.MessageResponse{
 			Message: "Not allowed for no admin users",
+		})
+	}
+
+	err = services.ValidateStruct(query)
+
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
+			Message: "Bad request",
+			Error:   err.Error(),
 		})
 	}
 

@@ -19,6 +19,15 @@ func CreateProduct(context *fiber.Ctx) error {
 		})
 	}
 
+	err = services.ValidateStruct(product)
+
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
+			Message: "Bad request",
+			Error:   err.Error(),
+		})
+	}
+
 	err = services.CreateProduct(product)
 
 	if err != nil {
@@ -44,6 +53,15 @@ func UpdateProduct(context *fiber.Ctx) error {
 		})
 	}
 
+	err = services.ValidateStruct(product)
+
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
+			Message: "Bad request",
+			Error:   err.Error(),
+		})
+	}
+
 	err = services.UpdateProduct(product)
 
 	if err != nil {
@@ -65,6 +83,15 @@ func ListProducts(context *fiber.Ctx) error {
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
 			Message: "Error parsing query params",
+			Error:   err.Error(),
+		})
+	}
+
+	err = services.ValidateStruct(query)
+
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
+			Message: "Bad request",
 			Error:   err.Error(),
 		})
 	}
@@ -112,6 +139,15 @@ func DeleteProduct(context *fiber.Ctx) error {
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
 			Message: "Error parsing query params",
+			Error:   err.Error(),
+		})
+	}
+
+	err = services.ValidateStruct(query)
+
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
+			Message: "Bad request",
 			Error:   err.Error(),
 		})
 	}

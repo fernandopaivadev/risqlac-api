@@ -24,7 +24,7 @@ func SetupUserRoutes() {
 	)
 	userRoutes.Post(
 		"/create",
-		middleware.ValidateToken,
+		// middleware.ValidateToken,
 		controllers.CreateUser,
 	)
 	userRoutes.Put(
