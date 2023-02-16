@@ -6,7 +6,6 @@ import (
 
 type User struct {
 	Id         uint64    `json:"id" gorm:"unique; autoIncrement; primaryKey; <-:create"`
-	Username   string    `json:"username" gorm:"unique" validate:"required"`
 	Email      string    `json:"email" gorm:"unique" validate:"required,email"`
 	Name       string    `json:"name" validate:"required"`
 	Phone      string    `json:"phone" validate:"required"`
@@ -24,7 +23,7 @@ type Product struct {
 	Storage         string    `json:"storage" validate:"required"`
 	Incompatibility string    `json:"incompatibility" validate:"required"`
 	Precautions     string    `json:"precautions" validate:"required"`
-	Symbols         string    `json:"symbols" validate:"required"`
+	Symbols         string    `json:"symbols"`
 	Name            string    `json:"name" validate:"required"`
 	Batch           string    `json:"batch" validate:"required"`
 	Due_date        string    `json:"due_date" validate:"required"`

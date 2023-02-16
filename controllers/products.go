@@ -87,15 +87,6 @@ func ListProducts(context *fiber.Ctx) error {
 		})
 	}
 
-	err = services.ValidateStruct(query)
-
-	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
-			Message: "Bad request",
-			Error:   err.Error(),
-		})
-	}
-
 	var products []models.Product
 
 	if query.Id != 0 {

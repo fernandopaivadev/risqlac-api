@@ -142,13 +142,9 @@ func CreateUser(user models.User) error {
 }
 
 func UpdateUser(user models.User) error {
-	result := database.Instance.Model(&user).Select("*").Updates(models.User{
-		Name:     user.Name,
-		Username: user.Username,
-		Email:    user.Email,
-		Phone:    user.Phone,
-		Is_admin: user.Is_admin,
-	})
+	result := database.Instance.Model(&user).Select(
+		"Email", "Name", "Phone", "Is_admin",
+	).Updates(&user)
 
 	if result.Error != nil {
 		return result.Error

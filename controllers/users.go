@@ -207,6 +207,7 @@ func UpdateUser(context *fiber.Ctx) error {
 		})
 	}
 
+	user.Password = "..." // needs a not empty value to pass validation
 	err = services.ValidateStruct(user)
 
 	if err != nil {
@@ -248,15 +249,6 @@ func ListUsers(context *fiber.Ctx) error {
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
 			Message: "Error parsing query params",
-			Error:   err.Error(),
-		})
-	}
-
-	err = services.ValidateStruct(query)
-
-	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
-			Message: "Bad request",
 			Error:   err.Error(),
 		})
 	}

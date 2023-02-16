@@ -6,7 +6,7 @@ type UserAuthRequest struct {
 }
 
 type ByIdRequest struct {
-	Id uint64 `json:"id" validate:"required"`
+	Id uint64 `json:"id"`
 }
 
 type RequestPasswordChangeRequest struct {
