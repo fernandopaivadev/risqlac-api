@@ -30,7 +30,7 @@ func Setup() {
 	}))
 
 	Instance.Get("/info", func(context *fiber.Ctx) error {
-		return context.Status(fiber.StatusOK).SendString("RisQLAC API v2.2.13")
+		return context.Status(fiber.StatusOK).SendString("RisQLAC API v2.2.14")
 	})
 
 	Instance.Get("/metrics", monitor.New(monitor.Config{
