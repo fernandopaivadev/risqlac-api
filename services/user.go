@@ -31,13 +31,13 @@ func GenerateUserToken(email string, password string) (string, error) {
 	}
 
 	claims := jwt.MapClaims{
-		"user_id":    user.Id,
-		"expires_at": time.Now().Add(24 * time.Hour).Unix(),
+		"UserId":    user.Id,
+		"ExpiresAt": time.Now().Add(24 * time.Hour).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	tokenString, err := token.SignedString([]byte(environment.Get().JWT_SECRET))
+	tokenString, err := token.SignedString([]byte(environment.Variables.JwtSecret))
 
 	if err != nil {
 		return "", nil
@@ -56,13 +56,13 @@ func GeneratePasswordChangeToken(email string) (string, error) {
 	}
 
 	claims := jwt.MapClaims{
-		"user_id":    user.Id,
-		"expires_at": time.Now().Add(5 * time.Minute).Unix(),
+		"UserId":    user.Id,
+		"ExpiresAt": time.Now().Add(5 * time.Minute).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	tokenString, err := token.SignedString([]byte(environment.Get().JWT_SECRET))
+	tokenString, err := token.SignedString([]byte(environment.Variables.JwtSecret))
 
 	if err != nil {
 		return "", nil
@@ -73,7 +73,7 @@ func GeneratePasswordChangeToken(email string) (string, error) {
 
 func ParseUserToken(tokenString string) (types.TokenClaims, error) {
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
-		return []byte(environment.Get().JWT_SECRET), nil
+		return []byte(environment.Variables.JwtSecret), nil
 	})
 
 	if err != nil {

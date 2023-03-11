@@ -26,7 +26,7 @@ func UpdateProduct(user types.Product) error {
 		Precautions:     user.Precautions,
 		Symbols:         user.Symbols,
 		Batch:           user.Batch,
-		Due_date:        user.Due_date,
+		DueDate:         user.DueDate,
 		Location:        user.Location,
 		Quantity:        user.Quantity,
 	})

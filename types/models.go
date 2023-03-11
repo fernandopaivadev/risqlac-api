@@ -5,14 +5,14 @@ import (
 )
 
 type User struct {
-	Id         uint64    `json:"id" gorm:"unique; autoIncrement; primaryKey; <-:create"`
-	Email      string    `json:"email" gorm:"unique" validate:"required,email"`
-	Name       string    `json:"name" validate:"required"`
-	Phone      string    `json:"phone" validate:"required"`
-	Password   string    `json:"password" validate:"required"`
-	Is_admin   bool      `json:"is_admin"`
-	Created_at time.Time `json:"created_at"`
-	Updated_at time.Time `json:"updated_at"`
+	Id        uint64    `json:"id" gorm:"unique; autoIncrement; primaryKey; <-:create"`
+	Email     string    `json:"email" gorm:"unique" validate:"required,email"`
+	Name      string    `json:"name" validate:"required"`
+	Phone     string    `json:"phone" validate:"required"`
+	Password  string    `json:"password" validate:"required"`
+	IsAdmin   bool      `json:"is_admin"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type Product struct {
@@ -26,9 +26,9 @@ type Product struct {
 	Symbols         string    `json:"symbols"`
 	Name            string    `json:"name" validate:"required"`
 	Batch           string    `json:"batch" validate:"required"`
-	Due_date        string    `json:"due_date" validate:"required"`
+	DueDate         string    `json:"due_date" validate:"required"`
 	Location        string    `json:"location" validate:"required"`
 	Quantity        string    `json:"quantity" validate:"required"`
-	Created_at      time.Time `json:"created_at"`
-	Updated_at      time.Time `json:"updated_at"`
+	CreatedAt       time.Time `json:"created_at"`
+	UpdatedAt       time.Time `json:"updated_at"`
 }

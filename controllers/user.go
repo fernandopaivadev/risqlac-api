@@ -152,7 +152,7 @@ func CreateUser(context *fiber.Ctx) error {
 	}
 
 	if !isAdmin {
-		user.Is_admin = false
+		user.IsAdmin = false
 	}
 
 	err = services.ValidateStruct(user)

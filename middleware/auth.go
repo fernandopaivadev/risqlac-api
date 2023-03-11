@@ -20,7 +20,7 @@ func ValidateToken(context *fiber.Ctx) error {
 		})
 	}
 
-	user, err := services.GetUserById(claims.User_id)
+	user, err := services.GetUserById(claims.UserId)
 
 	if err != nil {
 		return context.Status(fiber.StatusUnauthorized).JSON(types.ErrorResponse{
@@ -30,7 +30,7 @@ func ValidateToken(context *fiber.Ctx) error {
 	}
 
 	context.Request().Header.Add("user_id", fmt.Sprint(user.Id))
-	context.Request().Header.Add("is_admin", fmt.Sprint(user.Is_admin))
+	context.Request().Header.Add("is_admin", fmt.Sprint(user.IsAdmin))
 
 	return context.Next()
 }

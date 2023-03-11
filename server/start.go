@@ -3,7 +3,7 @@ package server
 import "risqlac-api/environment"
 
 func Start() {
-	serverPort := ":" + environment.Get().SERVER_PORT
+	serverPort := ":" + environment.Variables.ServerPort
 
 	err := Instance.Listen(serverPort)
 

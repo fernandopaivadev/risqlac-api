@@ -35,10 +35,10 @@ func formatProductList(products []types.Product) ([]string, [][]string) {
 			product.Incompatibility,
 			product.Precautions,
 			product.Batch,
-			product.Due_date,
+			product.DueDate,
 			product.Location,
 			product.Quantity,
-			product.Created_at.Local().String(),
+			product.CreatedAt.Local().String(),
 		}
 		content = append(content, row)
 	}

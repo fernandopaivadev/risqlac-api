@@ -10,7 +10,7 @@ import (
 func main() {
 	environment.Load()
 	database.Connect()
-	server.Init()
+	server.Setup()
 	routes.LoadUserRoutes()
 	routes.LoadProductRoutes()
 	server.Start()
