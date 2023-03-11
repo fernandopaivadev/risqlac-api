@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"risqlac-api/models"
+	"risqlac-api/reports"
 	"risqlac-api/services"
 	"risqlac-api/types"
 
@@ -9,7 +9,7 @@ import (
 )
 
 func CreateProduct(context *fiber.Ctx) error {
-	var product models.Product
+	var product types.Product
 	err := context.BodyParser(&product)
 
 	if err != nil {
@@ -43,7 +43,7 @@ func CreateProduct(context *fiber.Ctx) error {
 }
 
 func UpdateProduct(context *fiber.Ctx) error {
-	var product models.Product
+	var product types.Product
 	err := context.BodyParser(&product)
 
 	if err != nil {
@@ -87,7 +87,7 @@ func ListProducts(context *fiber.Ctx) error {
 		})
 	}
 
-	var products []models.Product
+	var products []types.Product
 
 	if query.Id != 0 {
 		product, err := services.GetProduct(query.Id)
@@ -155,4 +155,27 @@ func DeleteProduct(context *fiber.Ctx) error {
 	return context.Status(fiber.StatusOK).JSON(types.SuccessResponse{
 		Message: "Product deleted",
 	})
+}
+
+func ProductReport(context *fiber.Ctx) error {
+	products, err := services.ListProducts()
+
+	if err != nil {
+		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
+			Message: "Error retrieving products",
+			Error:   err.Error(),
+		})
+	}
+
+	file, err := reports.GetProductsReport("listagem de produtos", products)
+
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
+			Message: "Error generating pdf",
+			Error:   err.Error(),
+		})
+	}
+
+	context.Response().Header.Set("Content-Type", "application/pdf")
+	return context.Send(file)
 }

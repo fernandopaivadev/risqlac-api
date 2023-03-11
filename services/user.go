@@ -5,7 +5,6 @@ import (
 	"errors"
 	"risqlac-api/database"
 	"risqlac-api/environment"
-	"risqlac-api/models"
 	"risqlac-api/types"
 	"time"
 
@@ -14,7 +13,7 @@ import (
 )
 
 func GenerateUserToken(email string, password string) (string, error) {
-	var user models.User
+	var user types.User
 
 	user, err := GetUserByEmail(email)
 
@@ -48,7 +47,7 @@ func GenerateUserToken(email string, password string) (string, error) {
 }
 
 func GeneratePasswordChangeToken(email string) (string, error) {
-	var user models.User
+	var user types.User
 
 	user, err := GetUserByEmail(email)
 
@@ -107,9 +106,9 @@ func ChangeUserPassword(userId uint64, newPassword string) error {
 		return err
 	}
 
-	result := database.Instance.Model(&models.User{
+	result := database.Instance.Model(&types.User{
 		Id: userId,
-	}).Updates(models.User{
+	}).Updates(types.User{
 		Password: string(passwordHash),
 	})
 
@@ -120,7 +119,7 @@ func ChangeUserPassword(userId uint64, newPassword string) error {
 	return nil
 }
 
-func CreateUser(user models.User) error {
+func CreateUser(user types.User) error {
 	passwordHash, err := bcrypt.GenerateFromPassword(
 		[]byte(user.Password),
 		bcrypt.DefaultCost,
@@ -141,7 +140,7 @@ func CreateUser(user models.User) error {
 	return nil
 }
 
-func UpdateUser(user models.User) error {
+func UpdateUser(user types.User) error {
 	result := database.Instance.Model(&user).Select(
 		"Email", "Name", "Phone", "Is_admin",
 	).Updates(&user)
@@ -153,46 +152,46 @@ func UpdateUser(user models.User) error {
 	return nil
 }
 
-func GetUserById(userId uint64) (models.User, error) {
-	var user models.User
+func GetUserById(userId uint64) (types.User, error) {
+	var user types.User
 
 	result := database.Instance.First(&user, userId)
 
 	if result.Error != nil {
-		return models.User{}, result.Error
+		return types.User{}, result.Error
 	}
 
 	return user, nil
 }
 
-func GetUserByEmail(email string) (models.User, error) {
-	var user models.User
+func GetUserByEmail(email string) (types.User, error) {
+	var user types.User
 
-	result := database.Instance.Where(&models.User{
+	result := database.Instance.Where(&types.User{
 		Email: email,
 	}).First(&user)
 
 	if result.Error != nil {
-		return models.User{}, result.Error
+		return types.User{}, result.Error
 	}
 
 	return user, nil
 }
 
-func ListUsers() ([]models.User, error) {
-	var users []models.User
+func ListUsers() ([]types.User, error) {
+	var users []types.User
 
 	result := database.Instance.Find(&users)
 
 	if result.Error != nil {
-		return []models.User{}, result.Error
+		return []types.User{}, result.Error
 	}
 
 	return users, nil
 }
 
 func DeleteUser(userId uint64) error {
-	result := database.Instance.Delete(&models.User{}, userId)
+	result := database.Instance.Delete(&types.User{}, userId)
 
 	if result.Error != nil {
 		return result.Error

@@ -2,10 +2,10 @@ package services
 
 import (
 	"risqlac-api/database"
-	"risqlac-api/models"
+	"risqlac-api/types"
 )
 
-func CreateProduct(product models.Product) error {
+func CreateProduct(product types.Product) error {
 	result := database.Instance.Create(&product)
 
 	if result.Error != nil {
@@ -15,8 +15,8 @@ func CreateProduct(product models.Product) error {
 	return nil
 }
 
-func UpdateProduct(user models.Product) error {
-	result := database.Instance.Model(&user).Select("*").Updates(models.Product{
+func UpdateProduct(user types.Product) error {
+	result := database.Instance.Model(&user).Select("*").Updates(types.Product{
 		Name:            user.Name,
 		Synonym:         user.Synonym,
 		Class:           user.Class,
@@ -38,32 +38,32 @@ func UpdateProduct(user models.Product) error {
 	return nil
 }
 
-func GetProduct(productId uint64) (models.Product, error) {
-	var product models.Product
+func GetProduct(productId uint64) (types.Product, error) {
+	var product types.Product
 
 	result := database.Instance.First(&product, productId)
 
 	if result.Error != nil {
-		return models.Product{}, result.Error
+		return types.Product{}, result.Error
 	}
 
 	return product, nil
 }
 
-func ListProducts() ([]models.Product, error) {
-	var products []models.Product
+func ListProducts() ([]types.Product, error) {
+	var products []types.Product
 
 	result := database.Instance.Find(&products)
 
 	if result.Error != nil {
-		return []models.Product{}, result.Error
+		return []types.Product{}, result.Error
 	}
 
 	return products, nil
 }
 
 func DeleteProduct(productId uint64) error {
-	result := database.Instance.Delete(&models.Product{}, productId)
+	result := database.Instance.Delete(&types.Product{}, productId)
 
 	if result.Error != nil {
 		return result.Error

@@ -1,4 +1,4 @@
-package app
+package server
 
 import (
 	"time"
@@ -14,8 +14,12 @@ import (
 
 var Instance *fiber.App
 
-func Setup() {
+func Init() {
 	Instance = fiber.New()
+	//Instance = fiber.New(fiber.Config{
+	//	JSONEncoder: json.Marshal,
+	//	JSONDecoder: json.Unmarshal,
+	//})
 
 	Instance.Use(recover.New())
 	Instance.Use(logger.New())

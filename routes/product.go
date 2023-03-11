@@ -1,13 +1,13 @@
 package routes
 
 import (
-	"risqlac-api/app"
 	"risqlac-api/controllers"
 	"risqlac-api/middleware"
+	"risqlac-api/server"
 )
 
-func SetupProductRoutes() {
-	productRoutes := app.Instance.Group("/product")
+func LoadProductRoutes() {
+	productRoutes := server.Instance.Group("/product")
 
 	productRoutes.Post(
 		"/create",
@@ -31,5 +31,11 @@ func SetupProductRoutes() {
 		middleware.ValidateToken,
 		middleware.VerifyAdmin,
 		controllers.DeleteProduct,
+	)
+	productRoutes.Get(
+		"/report",
+		middleware.ValidateToken,
+		middleware.VerifyAdmin,
+		controllers.ProductReport,
 	)
 }
