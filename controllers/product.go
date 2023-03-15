@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"risqlac-api/reports"
 	"risqlac-api/services"
 	"risqlac-api/types"
 
@@ -167,7 +166,7 @@ func ProductReport(context *fiber.Ctx) error {
 		})
 	}
 
-	file, err := reports.GetProductsReport("listagem de produtos", products)
+	file, err := services.GetProductsReport(products)
 
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{

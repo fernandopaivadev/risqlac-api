@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/go-playground/validator/v10 v10.11.2
-	github.com/goccy/go-json v0.10.0
+	github.com/goccy/go-json v0.10.1
 	github.com/gofiber/fiber/v2 v2.42.0
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/johnfercher/maroto v0.40.0
@@ -28,7 +28,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/jung-kurt/gofpdf v1.16.2 // indirect
-	github.com/klauspost/compress v1.16.0 // indirect
+	github.com/klauspost/compress v1.16.3 // indirect
 	github.com/leodido/go-urn v1.2.2 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
@@ -41,7 +41,7 @@ require (
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	github.com/tinylib/msgp v1.1.8 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.44.0 // indirect
+	github.com/valyala/fasthttp v1.45.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	golang.org/x/sys v0.6.0 // indirect
 	golang.org/x/text v0.8.0 // indirect

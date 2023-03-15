@@ -35,7 +35,6 @@ func LoadProductRoutes() {
 	productRoutes.Get(
 		"/report",
 		middleware.ValidateToken,
-		middleware.VerifyAdmin,
 		controllers.ProductReport,
 	)
 }
