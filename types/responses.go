@@ -1,7 +1,5 @@
 package types
 
-import "risqlac-api/models"
-
 type SuccessResponse struct {
 	Message string `json:"message"`
 }
@@ -20,9 +18,9 @@ type UserAuthResponse struct {
 }
 
 type ListUsersResponse struct {
-	Users []models.User `json:"users"`
+	Users []User `json:"users"`
 }
 
 type ListProductsResponse struct {
-	Products []models.Product `json:"products"`
+	Products []Product `json:"products"`
 }

@@ -1,8 +1,9 @@
-package app
+package server
 
 import (
 	"time"
 
+	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -15,7 +16,10 @@ import (
 var Instance *fiber.App
 
 func Setup() {
-	Instance = fiber.New()
+	Instance = fiber.New(fiber.Config{
+		JSONEncoder: json.Marshal,
+		JSONDecoder: json.Unmarshal,
+	})
 
 	Instance.Use(recover.New())
 	Instance.Use(logger.New())

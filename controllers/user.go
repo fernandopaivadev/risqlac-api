@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"risqlac-api/models"
 	"risqlac-api/services"
 	"risqlac-api/types"
 	"strconv"
@@ -142,7 +141,7 @@ func CreateUser(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
 	isAdmin := requestHeaders["Is_admin"] == "true"
 
-	var user models.User
+	var user types.User
 	err := context.BodyParser(&user)
 
 	if err != nil {
@@ -153,7 +152,7 @@ func CreateUser(context *fiber.Ctx) error {
 	}
 
 	if !isAdmin {
-		user.Is_admin = false
+		user.IsAdmin = false
 	}
 
 	err = services.ValidateStruct(user)
@@ -191,7 +190,7 @@ func UpdateUser(context *fiber.Ctx) error {
 		})
 	}
 
-	var user models.User
+	var user types.User
 	err = context.BodyParser(&user)
 
 	if err != nil {
@@ -253,7 +252,7 @@ func ListUsers(context *fiber.Ctx) error {
 		})
 	}
 
-	var users []models.User
+	var users []types.User
 
 	if isAdmin {
 		if query.Id != 0 {
