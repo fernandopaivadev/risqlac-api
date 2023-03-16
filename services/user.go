@@ -12,10 +12,19 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func GenerateUserToken(email string, password string) (string, error) {
+type UserService struct{}
+
+var User UserService
+
+type TokenClaims struct {
+	UserId    uint64 `json:"UserId"`
+	ExpiresAt int64  `json:"ExpiresAt"`
+}
+
+func (service *UserService) GenerateToken(email string, password string) (string, error) {
 	var user types.User
 
-	user, err := GetUserByEmail(email)
+	user, err := service.GetByEmail(email)
 
 	if err != nil {
 		return "", err
@@ -46,10 +55,10 @@ func GenerateUserToken(email string, password string) (string, error) {
 	return tokenString, nil
 }
 
-func GeneratePasswordChangeToken(email string) (string, error) {
+func (service *UserService) GeneratePasswordChangeToken(email string) (string, error) {
 	var user types.User
 
-	user, err := GetUserByEmail(email)
+	user, err := service.GetByEmail(email)
 
 	if err != nil {
 		return "", err
@@ -71,32 +80,32 @@ func GeneratePasswordChangeToken(email string) (string, error) {
 	return tokenString, nil
 }
 
-func ParseUserToken(tokenString string) (types.TokenClaims, error) {
+func (service *UserService) ParseToken(tokenString string) (TokenClaims, error) {
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 		return []byte(environment.Variables.JwtSecret), nil
 	})
 
 	if err != nil {
-		return types.TokenClaims{}, err
+		return TokenClaims{}, err
 	}
 
 	if !token.Valid {
-		return types.TokenClaims{}, errors.New("invalid token")
+		return TokenClaims{}, errors.New("invalid token")
 	}
 
 	jwtClaims, _ := token.Claims.(jwt.MapClaims)
-	var claimsObject types.TokenClaims
+	var claimsObject TokenClaims
 	claimsJSON, _ := json.Marshal(jwtClaims)
 	err = json.Unmarshal(claimsJSON, &claimsObject)
 
 	if err != nil {
-		return types.TokenClaims{}, err
+		return TokenClaims{}, err
 	}
 
 	return claimsObject, nil
 }
 
-func ChangeUserPassword(userId uint64, newPassword string) error {
+func (service *UserService) ChangePassword(userId uint64, newPassword string) error {
 	passwordHash, err := bcrypt.GenerateFromPassword(
 		[]byte(newPassword),
 		bcrypt.DefaultCost,
@@ -119,7 +128,7 @@ func ChangeUserPassword(userId uint64, newPassword string) error {
 	return nil
 }
 
-func CreateUser(user types.User) error {
+func (service *UserService) Create(user types.User) error {
 	passwordHash, err := bcrypt.GenerateFromPassword(
 		[]byte(user.Password),
 		bcrypt.DefaultCost,
@@ -140,7 +149,7 @@ func CreateUser(user types.User) error {
 	return nil
 }
 
-func UpdateUser(user types.User) error {
+func (service *UserService) Update(user types.User) error {
 	result := database.Instance.Model(&user).Select(
 		"Email", "Name", "Phone", "Is_admin",
 	).Updates(&user)
@@ -152,7 +161,7 @@ func UpdateUser(user types.User) error {
 	return nil
 }
 
-func GetUserById(userId uint64) (types.User, error) {
+func (service *UserService) GetById(userId uint64) (types.User, error) {
 	var user types.User
 
 	result := database.Instance.First(&user, userId)
@@ -164,7 +173,7 @@ func GetUserById(userId uint64) (types.User, error) {
 	return user, nil
 }
 
-func GetUserByEmail(email string) (types.User, error) {
+func (service *UserService) GetByEmail(email string) (types.User, error) {
 	var user types.User
 
 	result := database.Instance.Where(&types.User{
@@ -178,7 +187,7 @@ func GetUserByEmail(email string) (types.User, error) {
 	return user, nil
 }
 
-func ListUsers() ([]types.User, error) {
+func (service *UserService) List() ([]types.User, error) {
 	var users []types.User
 
 	result := database.Instance.Find(&users)
@@ -190,7 +199,7 @@ func ListUsers() ([]types.User, error) {
 	return users, nil
 }
 
-func DeleteUser(userId uint64) error {
+func (service *UserService) Delete(userId uint64) error {
 	result := database.Instance.Delete(&types.User{}, userId)
 
 	if result.Error != nil {

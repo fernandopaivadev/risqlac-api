@@ -1,40 +1,44 @@
 package routes
 
 import (
+	"github.com/gofiber/fiber/v2"
 	"risqlac-api/controllers"
 	"risqlac-api/middleware"
-	"risqlac-api/server"
 )
 
-func LoadProductRoutes() {
-	productRoutes := server.Instance.Group("/product")
+type ProductRoutes struct{}
+
+var Product ProductRoutes
+
+func (routes *ProductRoutes) Load(app *fiber.App) {
+	productRoutes := app.Group("/product")
 
 	productRoutes.Post(
 		"/create",
 		middleware.ValidateToken,
 		middleware.VerifyAdmin,
-		controllers.CreateProduct,
+		controllers.Product.Create,
 	)
 	productRoutes.Put(
 		"/update",
 		middleware.ValidateToken,
 		middleware.VerifyAdmin,
-		controllers.UpdateProduct,
+		controllers.Product.Update,
 	)
 	productRoutes.Get(
 		"/list",
 		middleware.ValidateToken,
-		controllers.ListProducts,
+		controllers.Product.List,
 	)
 	productRoutes.Delete(
 		"/delete",
 		middleware.ValidateToken,
 		middleware.VerifyAdmin,
-		controllers.DeleteProduct,
+		controllers.Product.Delete,
 	)
 	productRoutes.Get(
 		"/report",
 		middleware.ValidateToken,
-		controllers.ProductReport,
+		controllers.Product.GetReport,
 	)
 }

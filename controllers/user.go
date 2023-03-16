@@ -8,7 +8,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func UserLogin(context *fiber.Ctx) error {
+type UserController struct{}
+
+var User UserController
+
+func (controller *UserController) Login(context *fiber.Ctx) error {
 	var query types.UserAuthRequest
 	err := context.QueryParser(&query)
 
@@ -19,7 +23,7 @@ func UserLogin(context *fiber.Ctx) error {
 		})
 	}
 
-	err = services.ValidateStruct(query)
+	err = services.Utils.ValidateStruct(query)
 
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
@@ -28,7 +32,7 @@ func UserLogin(context *fiber.Ctx) error {
 		})
 	}
 
-	token, err := services.GenerateUserToken(query.Email, query.Password)
+	token, err := services.User.GenerateToken(query.Email, query.Password)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -42,7 +46,7 @@ func UserLogin(context *fiber.Ctx) error {
 	})
 }
 
-func RequestPasswordChange(context *fiber.Ctx) error {
+func (controller *UserController) RequestPasswordChange(context *fiber.Ctx) error {
 	var query types.RequestPasswordChangeRequest
 	err := context.QueryParser(&query)
 
@@ -53,7 +57,7 @@ func RequestPasswordChange(context *fiber.Ctx) error {
 		})
 	}
 
-	err = services.ValidateStruct(query)
+	err = services.Utils.ValidateStruct(query)
 
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
@@ -62,7 +66,7 @@ func RequestPasswordChange(context *fiber.Ctx) error {
 		})
 	}
 
-	user, err := services.GetUserByEmail(query.Email)
+	user, err := services.User.GetByEmail(query.Email)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -71,7 +75,7 @@ func RequestPasswordChange(context *fiber.Ctx) error {
 		})
 	}
 
-	token, err := services.GeneratePasswordChangeToken(user.Email)
+	token, err := services.User.GeneratePasswordChangeToken(user.Email)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -80,20 +84,22 @@ func RequestPasswordChange(context *fiber.Ctx) error {
 		})
 	}
 
-	go services.SendEmail(
-		user.Name,
-		user.Email,
-		"RECUPERAÇÃO DE SENHA",
-		"TOKEN DE RECUPERAÇÃO: "+token,
-		"",
-	)
+	go func() {
+		_ = services.Utils.SendEmail(
+			user.Name,
+			user.Email,
+			"RECUPERAÇÃO DE SENHA",
+			"TOKEN DE RECUPERAÇÃO: "+token,
+			"",
+		)
+	}()
 
 	return context.Status(fiber.StatusAccepted).JSON(types.SuccessResponse{
 		Message: "Password recovery email sent",
 	})
 }
 
-func ChangePassword(context *fiber.Ctx) error {
+func (controller *UserController) ChangePassword(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
 	tokenUserId, err := strconv.ParseUint(requestHeaders["User_id"], 10, 64)
 
@@ -114,7 +120,7 @@ func ChangePassword(context *fiber.Ctx) error {
 		})
 	}
 
-	err = services.ValidateStruct(query)
+	err = services.Utils.ValidateStruct(query)
 
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
@@ -123,7 +129,7 @@ func ChangePassword(context *fiber.Ctx) error {
 		})
 	}
 
-	err = services.ChangeUserPassword(tokenUserId, query.Password)
+	err = services.User.ChangePassword(tokenUserId, query.Password)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -137,7 +143,7 @@ func ChangePassword(context *fiber.Ctx) error {
 	})
 }
 
-func CreateUser(context *fiber.Ctx) error {
+func (controller *UserController) Create(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
 	isAdmin := requestHeaders["Is_admin"] == "true"
 
@@ -155,7 +161,7 @@ func CreateUser(context *fiber.Ctx) error {
 		user.IsAdmin = false
 	}
 
-	err = services.ValidateStruct(user)
+	err = services.Utils.ValidateStruct(user)
 
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
@@ -164,7 +170,7 @@ func CreateUser(context *fiber.Ctx) error {
 		})
 	}
 
-	err = services.CreateUser(user)
+	err = services.User.Create(user)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -178,7 +184,7 @@ func CreateUser(context *fiber.Ctx) error {
 	})
 }
 
-func UpdateUser(context *fiber.Ctx) error {
+func (controller *UserController) Update(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
 	isAdmin := requestHeaders["Is_admin"] == "true"
 	tokenUserId, err := strconv.ParseUint(requestHeaders["User_id"], 10, 64)
@@ -207,7 +213,7 @@ func UpdateUser(context *fiber.Ctx) error {
 	}
 
 	user.Password = "..." // needs a not empty value to pass validation
-	err = services.ValidateStruct(user)
+	err = services.Utils.ValidateStruct(user)
 
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
@@ -216,7 +222,7 @@ func UpdateUser(context *fiber.Ctx) error {
 		})
 	}
 
-	err = services.UpdateUser(user)
+	err = services.User.Update(user)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -230,7 +236,7 @@ func UpdateUser(context *fiber.Ctx) error {
 	})
 }
 
-func ListUsers(context *fiber.Ctx) error {
+func (controller *UserController) List(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
 	isAdmin := requestHeaders["Is_admin"] == "true"
 	tokenUserId, err := strconv.ParseUint(requestHeaders["User_id"], 10, 64)
@@ -256,7 +262,7 @@ func ListUsers(context *fiber.Ctx) error {
 
 	if isAdmin {
 		if query.Id != 0 {
-			user, err := services.GetUserById(query.Id)
+			user, err := services.User.GetById(query.Id)
 
 			if err != nil {
 				return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -267,7 +273,7 @@ func ListUsers(context *fiber.Ctx) error {
 
 			users = append(users, user)
 		} else {
-			users, err = services.ListUsers()
+			users, err = services.User.List()
 
 			if err != nil {
 				return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -277,7 +283,7 @@ func ListUsers(context *fiber.Ctx) error {
 			}
 		}
 	} else {
-		user, err := services.GetUserById(tokenUserId)
+		user, err := services.User.GetById(tokenUserId)
 
 		if err != nil {
 			return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -301,7 +307,7 @@ func ListUsers(context *fiber.Ctx) error {
 	})
 }
 
-func DeleteUser(context *fiber.Ctx) error {
+func (controller *UserController) Delete(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
 	isAdmin := requestHeaders["Is_admin"] == "true"
 	tokenUserId, err := strconv.ParseUint(requestHeaders["User_id"], 10, 64)
@@ -329,7 +335,7 @@ func DeleteUser(context *fiber.Ctx) error {
 		})
 	}
 
-	err = services.ValidateStruct(query)
+	err = services.Utils.ValidateStruct(query)
 
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
@@ -338,7 +344,7 @@ func DeleteUser(context *fiber.Ctx) error {
 		})
 	}
 
-	err = services.DeleteUser(query.Id)
+	err = services.User.Delete(query.Id)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{

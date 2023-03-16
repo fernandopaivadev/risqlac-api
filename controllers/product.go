@@ -7,7 +7,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func CreateProduct(context *fiber.Ctx) error {
+type ProductController struct{}
+
+var Product ProductController
+
+func (controller *ProductController) Create(context *fiber.Ctx) error {
 	var product types.Product
 	err := context.BodyParser(&product)
 
@@ -18,7 +22,7 @@ func CreateProduct(context *fiber.Ctx) error {
 		})
 	}
 
-	err = services.ValidateStruct(product)
+	err = services.Utils.ValidateStruct(product)
 
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
@@ -27,7 +31,7 @@ func CreateProduct(context *fiber.Ctx) error {
 		})
 	}
 
-	err = services.CreateProduct(product)
+	err = services.Product.Create(product)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -41,7 +45,7 @@ func CreateProduct(context *fiber.Ctx) error {
 	})
 }
 
-func UpdateProduct(context *fiber.Ctx) error {
+func (controller *ProductController) Update(context *fiber.Ctx) error {
 	var product types.Product
 	err := context.BodyParser(&product)
 
@@ -52,7 +56,7 @@ func UpdateProduct(context *fiber.Ctx) error {
 		})
 	}
 
-	err = services.ValidateStruct(product)
+	err = services.Utils.ValidateStruct(product)
 
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
@@ -61,7 +65,7 @@ func UpdateProduct(context *fiber.Ctx) error {
 		})
 	}
 
-	err = services.UpdateProduct(product)
+	err = services.Product.Update(product)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -75,7 +79,7 @@ func UpdateProduct(context *fiber.Ctx) error {
 	})
 }
 
-func ListProducts(context *fiber.Ctx) error {
+func (controller *ProductController) List(context *fiber.Ctx) error {
 	var query types.ByIdRequest
 	err := context.QueryParser(&query)
 
@@ -89,7 +93,7 @@ func ListProducts(context *fiber.Ctx) error {
 	var products []types.Product
 
 	if query.Id != 0 {
-		product, err := services.GetProduct(query.Id)
+		product, err := services.Product.GetById(query.Id)
 
 		if err != nil {
 			return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -100,7 +104,7 @@ func ListProducts(context *fiber.Ctx) error {
 
 		products = append(products, product)
 	} else {
-		products, err = services.ListProducts()
+		products, err = services.Product.List()
 
 		if err != nil {
 			return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -122,7 +126,7 @@ func ListProducts(context *fiber.Ctx) error {
 	})
 }
 
-func DeleteProduct(context *fiber.Ctx) error {
+func (controller *ProductController) Delete(context *fiber.Ctx) error {
 	var query types.ByIdRequest
 	err := context.QueryParser(&query)
 
@@ -133,7 +137,7 @@ func DeleteProduct(context *fiber.Ctx) error {
 		})
 	}
 
-	err = services.ValidateStruct(query)
+	err = services.Utils.ValidateStruct(query)
 
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
@@ -142,7 +146,7 @@ func DeleteProduct(context *fiber.Ctx) error {
 		})
 	}
 
-	err = services.DeleteProduct(query.Id)
+	err = services.Product.Delete(query.Id)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -156,8 +160,8 @@ func DeleteProduct(context *fiber.Ctx) error {
 	})
 }
 
-func ProductReport(context *fiber.Ctx) error {
-	products, err := services.ListProducts()
+func (controller *ProductController) GetReport(context *fiber.Ctx) error {
+	products, err := services.Product.List()
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -166,7 +170,7 @@ func ProductReport(context *fiber.Ctx) error {
 		})
 	}
 
-	file, err := services.GetProductsReport(products)
+	file, err := services.Product.GetReport(products)
 
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{

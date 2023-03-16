@@ -1,14 +1,23 @@
 package services
 
 import (
-	"errors"
-	"risqlac-api/environment"
-
+	"github.com/go-playground/validator/v10"
+	"github.com/pkg/errors"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
+	"risqlac-api/environment"
 )
 
-func SendEmail(
+type UtilsService struct{}
+
+var Utils UtilsService
+
+func (service *UtilsService) ValidateStruct(data interface{}) error {
+	validate := validator.New()
+	return validate.Struct(data)
+}
+
+func (service *UtilsService) SendEmail(
 	receiverName string,
 	receiverEmailAddress string,
 	subject string,

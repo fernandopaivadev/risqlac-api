@@ -11,7 +11,7 @@ import (
 func ValidateToken(context *fiber.Ctx) error {
 	headers := context.GetReqHeaders()
 	tokenString := headers["Authorization"]
-	claims, err := services.ParseUserToken(tokenString)
+	claims, err := services.User.ParseToken(tokenString)
 
 	if err != nil {
 		return context.Status(fiber.StatusUnauthorized).JSON(types.ErrorResponse{
@@ -20,7 +20,7 @@ func ValidateToken(context *fiber.Ctx) error {
 		})
 	}
 
-	user, err := services.GetUserById(claims.UserId)
+	user, err := services.User.GetById(claims.UserId)
 
 	if err != nil {
 		return context.Status(fiber.StatusUnauthorized).JSON(types.ErrorResponse{

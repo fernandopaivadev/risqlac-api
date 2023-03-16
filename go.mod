@@ -9,6 +9,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/johnfercher/maroto v0.40.0
 	github.com/joho/godotenv v1.5.1
+	github.com/pkg/errors v0.9.1
 	github.com/sendgrid/sendgrid-go v3.12.0+incompatible
 	golang.org/x/crypto v0.7.0
 	gorm.io/driver/sqlite v1.4.4

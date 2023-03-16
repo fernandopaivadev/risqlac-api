@@ -2,13 +2,18 @@ package environment
 
 import (
 	"fmt"
-	"os"
-	"risqlac-api/types"
-
 	"github.com/joho/godotenv"
+	"os"
 )
 
-var Variables types.EnvironmentVariables
+type EnvVars struct {
+	ServerPort     string
+	JwtSecret      string
+	DatabaseFile   string
+	SendgridApiKey string
+}
+
+var Variables EnvVars
 
 func Load() {
 	err := godotenv.Load()
