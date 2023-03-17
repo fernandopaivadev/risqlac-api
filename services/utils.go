@@ -12,12 +12,12 @@ type UtilsService struct{}
 
 var Utils UtilsService
 
-func (service *UtilsService) ValidateStruct(data interface{}) error {
+func (_ *UtilsService) ValidateStruct(data interface{}) error {
 	validate := validator.New()
 	return validate.Struct(data)
 }
 
-func (service *UtilsService) SendEmail(
+func (_ *UtilsService) SendEmail(
 	receiverName string,
 	receiverEmailAddress string,
 	subject string,

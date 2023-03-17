@@ -1,11 +1,16 @@
 package services
 
 import (
+	"bytes"
+	"encoding/csv"
+	"fmt"
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
+	"github.com/xuri/excelize/v2"
 	"risqlac-api/database"
 	"risqlac-api/types"
+	"strconv"
 	"time"
 )
 
@@ -13,7 +18,7 @@ type ProductService struct{}
 
 var Product ProductService
 
-func (service *ProductService) Create(product types.Product) error {
+func (_ *ProductService) Create(product types.Product) error {
 	result := database.Instance.Create(&product)
 
 	if result.Error != nil {
@@ -23,7 +28,7 @@ func (service *ProductService) Create(product types.Product) error {
 	return nil
 }
 
-func (service *ProductService) Update(user types.Product) error {
+func (_ *ProductService) Update(user types.Product) error {
 	result := database.Instance.Model(&user).Select("*").Updates(types.Product{
 		Name:            user.Name,
 		Synonym:         user.Synonym,
@@ -46,7 +51,7 @@ func (service *ProductService) Update(user types.Product) error {
 	return nil
 }
 
-func (service *ProductService) GetById(productId uint64) (types.Product, error) {
+func (_ *ProductService) GetById(productId uint64) (types.Product, error) {
 	var product types.Product
 
 	result := database.Instance.First(&product, productId)
@@ -58,7 +63,7 @@ func (service *ProductService) GetById(productId uint64) (types.Product, error) 
 	return product, nil
 }
 
-func (service *ProductService) List() ([]types.Product, error) {
+func (_ *ProductService) List() ([]types.Product, error) {
 	var products []types.Product
 
 	result := database.Instance.Find(&products)
@@ -70,7 +75,7 @@ func (service *ProductService) List() ([]types.Product, error) {
 	return products, nil
 }
 
-func (service *ProductService) Delete(productId uint64) error {
+func (_ *ProductService) Delete(productId uint64) error {
 	result := database.Instance.Delete(&types.Product{}, productId)
 
 	if result.Error != nil {
@@ -133,7 +138,7 @@ func formatDatetime(datetime time.Time) string {
 	return datetime.Local().Format("02/01/2006")
 }
 
-func (service *ProductService) GetReport(products []types.Product) ([]byte, error) {
+func (_ *ProductService) GetReportPDF(products []types.Product) ([]byte, error) {
 	maroto := pdf.NewMaroto(consts.Portrait, consts.A4)
 	maroto.SetPageMargins(20, 5, 20)
 	maroto.SetTitle("Relatório de Produtos", true)
@@ -163,4 +168,123 @@ func (service *ProductService) GetReport(products []types.Product) ([]byte, erro
 	}
 
 	return file.Bytes(), nil
+}
+
+func (_ *ProductService) GetReportCSV(products []types.Product) ([]byte, error) {
+	rows := [][]string{
+		{
+			"Nome",
+			"Sinônimo",
+			"Classe",
+			"Subclasse",
+			"Armazenagem",
+			"Imcompatibilidade",
+			"Precauções",
+			"Lote",
+			"Local",
+			"Quantidade",
+			"Data de cadastro",
+		},
+	}
+
+	for i := range products {
+		rows = append(rows, []string{
+			products[i].Name,
+			products[i].Synonym,
+			products[i].Class,
+			products[i].Subclass,
+			products[i].Storage,
+			products[i].Incompatibility,
+			products[i].Precautions,
+			products[i].Batch,
+			products[i].Location,
+			products[i].Quantity,
+			formatDatetime(products[i].CreatedAt),
+		})
+	}
+
+	var buffer bytes.Buffer
+	err := csv.NewWriter(&buffer).WriteAll(rows)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return buffer.Bytes(), nil
+}
+
+func (_ *ProductService) GetReportXLSX(products []types.Product) ([]byte, error) {
+	rows := [][]string{
+		{
+			"Nome",
+			"Sinônimos",
+			"Classe",
+			"Subclasse",
+			"Armazenagem",
+			"Incompatibilidades",
+			"Precauções",
+			"Lote",
+			"Local",
+			"Quantidade",
+			"Data de cadastro",
+		},
+	}
+
+	for i := range products {
+		rows = append(rows, []string{
+			products[i].Name,
+			products[i].Synonym,
+			products[i].Class,
+			products[i].Subclass,
+			products[i].Storage,
+			products[i].Incompatibility,
+			products[i].Precautions,
+			products[i].Batch,
+			products[i].Location,
+			products[i].Quantity,
+			formatDatetime(products[i].CreatedAt),
+		})
+	}
+
+	file := excelize.NewFile()
+
+	defer func() {
+		err := file.Close()
+
+		if err != nil {
+			fmt.Println(err)
+		}
+	}()
+
+	file.SetActiveSheet(0)
+
+	sheetName := "Lista de produtos"
+
+	err := file.SetSheetName("Sheet1", sheetName)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range rows {
+		cell := "A" + strconv.Itoa(i+1)
+
+		err := file.SetSheetRow(sheetName, cell, &rows[i])
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	buffer, err := file.WriteToBuffer()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return buffer.Bytes(), nil
 }

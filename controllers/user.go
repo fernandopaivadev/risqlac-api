@@ -12,7 +12,7 @@ type UserController struct{}
 
 var User UserController
 
-func (controller *UserController) Login(context *fiber.Ctx) error {
+func (_ *UserController) Login(context *fiber.Ctx) error {
 	var query types.UserAuthRequest
 	err := context.QueryParser(&query)
 
@@ -46,7 +46,7 @@ func (controller *UserController) Login(context *fiber.Ctx) error {
 	})
 }
 
-func (controller *UserController) RequestPasswordChange(context *fiber.Ctx) error {
+func (_ *UserController) RequestPasswordChange(context *fiber.Ctx) error {
 	var query types.RequestPasswordChangeRequest
 	err := context.QueryParser(&query)
 
@@ -99,9 +99,9 @@ func (controller *UserController) RequestPasswordChange(context *fiber.Ctx) erro
 	})
 }
 
-func (controller *UserController) ChangePassword(context *fiber.Ctx) error {
+func (_ *UserController) ChangePassword(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
-	tokenUserId, err := strconv.ParseUint(requestHeaders["User_id"], 10, 64)
+	tokenUserId, err := strconv.ParseUint(requestHeaders["UserId"], 10, 64)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -143,9 +143,9 @@ func (controller *UserController) ChangePassword(context *fiber.Ctx) error {
 	})
 }
 
-func (controller *UserController) Create(context *fiber.Ctx) error {
+func (_ *UserController) Create(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
-	isAdmin := requestHeaders["Is_admin"] == "true"
+	isAdmin := requestHeaders["IsAdmin"] == "true"
 
 	var user types.User
 	err := context.BodyParser(&user)
@@ -184,10 +184,10 @@ func (controller *UserController) Create(context *fiber.Ctx) error {
 	})
 }
 
-func (controller *UserController) Update(context *fiber.Ctx) error {
+func (_ *UserController) Update(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
-	isAdmin := requestHeaders["Is_admin"] == "true"
-	tokenUserId, err := strconv.ParseUint(requestHeaders["User_id"], 10, 64)
+	isAdmin := requestHeaders["IsAdmin"] == "true"
+	tokenUserId, err := strconv.ParseUint(requestHeaders["UserId"], 10, 64)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -236,10 +236,10 @@ func (controller *UserController) Update(context *fiber.Ctx) error {
 	})
 }
 
-func (controller *UserController) List(context *fiber.Ctx) error {
+func (_ *UserController) List(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
-	isAdmin := requestHeaders["Is_admin"] == "true"
-	tokenUserId, err := strconv.ParseUint(requestHeaders["User_id"], 10, 64)
+	isAdmin := requestHeaders["IsAdmin"] == "true"
+	tokenUserId, err := strconv.ParseUint(requestHeaders["UserId"], 10, 64)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -307,10 +307,10 @@ func (controller *UserController) List(context *fiber.Ctx) error {
 	})
 }
 
-func (controller *UserController) Delete(context *fiber.Ctx) error {
+func (_ *UserController) Delete(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
-	isAdmin := requestHeaders["Is_admin"] == "true"
-	tokenUserId, err := strconv.ParseUint(requestHeaders["User_id"], 10, 64)
+	isAdmin := requestHeaders["IsAdmin"] == "true"
+	tokenUserId, err := strconv.ParseUint(requestHeaders["UserId"], 10, 64)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{

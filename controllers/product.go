@@ -11,7 +11,7 @@ type ProductController struct{}
 
 var Product ProductController
 
-func (controller *ProductController) Create(context *fiber.Ctx) error {
+func (_ *ProductController) Create(context *fiber.Ctx) error {
 	var product types.Product
 	err := context.BodyParser(&product)
 
@@ -45,7 +45,7 @@ func (controller *ProductController) Create(context *fiber.Ctx) error {
 	})
 }
 
-func (controller *ProductController) Update(context *fiber.Ctx) error {
+func (_ *ProductController) Update(context *fiber.Ctx) error {
 	var product types.Product
 	err := context.BodyParser(&product)
 
@@ -79,7 +79,7 @@ func (controller *ProductController) Update(context *fiber.Ctx) error {
 	})
 }
 
-func (controller *ProductController) List(context *fiber.Ctx) error {
+func (_ *ProductController) List(context *fiber.Ctx) error {
 	var query types.ByIdRequest
 	err := context.QueryParser(&query)
 
@@ -126,7 +126,7 @@ func (controller *ProductController) List(context *fiber.Ctx) error {
 	})
 }
 
-func (controller *ProductController) Delete(context *fiber.Ctx) error {
+func (_ *ProductController) Delete(context *fiber.Ctx) error {
 	var query types.ByIdRequest
 	err := context.QueryParser(&query)
 
@@ -160,7 +160,7 @@ func (controller *ProductController) Delete(context *fiber.Ctx) error {
 	})
 }
 
-func (controller *ProductController) GetReport(context *fiber.Ctx) error {
+func (_ *ProductController) GetReportPDF(context *fiber.Ctx) error {
 	products, err := services.Product.List()
 
 	if err != nil {
@@ -170,7 +170,7 @@ func (controller *ProductController) GetReport(context *fiber.Ctx) error {
 		})
 	}
 
-	file, err := services.Product.GetReport(products)
+	file, err := services.Product.GetReportPDF(products)
 
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
@@ -180,5 +180,54 @@ func (controller *ProductController) GetReport(context *fiber.Ctx) error {
 	}
 
 	context.Response().Header.Set("Content-Type", "application/pdf")
+	return context.Send(file)
+}
+
+func (_ *ProductController) GetReportCSV(context *fiber.Ctx) error {
+	products, err := services.Product.List()
+
+	if err != nil {
+		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
+			Message: "Error retrieving products",
+			Error:   err.Error(),
+		})
+	}
+
+	file, err := services.Product.GetReportCSV(products)
+
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
+			Message: "Error generating csv",
+			Error:   err.Error(),
+		})
+	}
+
+	context.Response().Header.Set("Content-Type", "application/csv")
+	return context.Send(file)
+}
+
+func (_ *ProductController) GetReportXLSX(context *fiber.Ctx) error {
+	products, err := services.Product.List()
+
+	if err != nil {
+		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
+			Message: "Error retrieving products",
+			Error:   err.Error(),
+		})
+	}
+
+	file, err := services.Product.GetReportXLSX(products)
+
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
+			Message: "Error generating xlsx",
+			Error:   err.Error(),
+		})
+	}
+
+	context.Response().Header.Set(
+		"Content-Type",
+		"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+	)
 	return context.Send(file)
 }

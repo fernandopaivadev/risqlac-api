@@ -80,7 +80,7 @@ func (service *UserService) GeneratePasswordChangeToken(email string) (string, e
 	return tokenString, nil
 }
 
-func (service *UserService) ParseToken(tokenString string) (TokenClaims, error) {
+func (_ *UserService) ParseToken(tokenString string) (TokenClaims, error) {
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 		return []byte(environment.Variables.JwtSecret), nil
 	})
@@ -105,7 +105,7 @@ func (service *UserService) ParseToken(tokenString string) (TokenClaims, error) 
 	return claimsObject, nil
 }
 
-func (service *UserService) ChangePassword(userId uint64, newPassword string) error {
+func (_ *UserService) ChangePassword(userId uint64, newPassword string) error {
 	passwordHash, err := bcrypt.GenerateFromPassword(
 		[]byte(newPassword),
 		bcrypt.DefaultCost,
@@ -128,7 +128,7 @@ func (service *UserService) ChangePassword(userId uint64, newPassword string) er
 	return nil
 }
 
-func (service *UserService) Create(user types.User) error {
+func (_ *UserService) Create(user types.User) error {
 	passwordHash, err := bcrypt.GenerateFromPassword(
 		[]byte(user.Password),
 		bcrypt.DefaultCost,
@@ -149,7 +149,7 @@ func (service *UserService) Create(user types.User) error {
 	return nil
 }
 
-func (service *UserService) Update(user types.User) error {
+func (_ *UserService) Update(user types.User) error {
 	result := database.Instance.Model(&user).Select(
 		"Email", "Name", "Phone", "Is_admin",
 	).Updates(&user)
@@ -161,7 +161,7 @@ func (service *UserService) Update(user types.User) error {
 	return nil
 }
 
-func (service *UserService) GetById(userId uint64) (types.User, error) {
+func (_ *UserService) GetById(userId uint64) (types.User, error) {
 	var user types.User
 
 	result := database.Instance.First(&user, userId)
@@ -173,7 +173,7 @@ func (service *UserService) GetById(userId uint64) (types.User, error) {
 	return user, nil
 }
 
-func (service *UserService) GetByEmail(email string) (types.User, error) {
+func (_ *UserService) GetByEmail(email string) (types.User, error) {
 	var user types.User
 
 	result := database.Instance.Where(&types.User{
@@ -187,7 +187,7 @@ func (service *UserService) GetByEmail(email string) (types.User, error) {
 	return user, nil
 }
 
-func (service *UserService) List() ([]types.User, error) {
+func (_ *UserService) List() ([]types.User, error) {
 	var users []types.User
 
 	result := database.Instance.Find(&users)
@@ -199,7 +199,7 @@ func (service *UserService) List() ([]types.User, error) {
 	return users, nil
 }
 
-func (service *UserService) Delete(userId uint64) error {
+func (_ *UserService) Delete(userId uint64) error {
 	result := database.Instance.Delete(&types.User{}, userId)
 
 	if result.Error != nil {
