@@ -37,8 +37,18 @@ func (routes *ProductRoutes) Load(app *fiber.App) {
 		controllers.Product.Delete,
 	)
 	productRoutes.Get(
-		"/report",
+		"/report/pdf",
 		middleware.ValidateToken,
-		controllers.Product.GetReport,
+		controllers.Product.GetReportPDF,
+	)
+	productRoutes.Get(
+		"/report/csv",
+		middleware.ValidateToken,
+		controllers.Product.GetReportCSV,
+	)
+	productRoutes.Get(
+		"/report/xlsx",
+		middleware.ValidateToken,
+		controllers.Product.GetReportXLSX,
 	)
 }

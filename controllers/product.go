@@ -160,7 +160,7 @@ func (controller *ProductController) Delete(context *fiber.Ctx) error {
 	})
 }
 
-func (controller *ProductController) GetReport(context *fiber.Ctx) error {
+func (controller *ProductController) GetReportPDF(context *fiber.Ctx) error {
 	products, err := services.Product.List()
 
 	if err != nil {
@@ -170,7 +170,7 @@ func (controller *ProductController) GetReport(context *fiber.Ctx) error {
 		})
 	}
 
-	file, err := services.Product.GetReport(products)
+	file, err := services.Product.GetReportPDF(products)
 
 	if err != nil {
 		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
@@ -180,5 +180,54 @@ func (controller *ProductController) GetReport(context *fiber.Ctx) error {
 	}
 
 	context.Response().Header.Set("Content-Type", "application/pdf")
+	return context.Send(file)
+}
+
+func (controller *ProductController) GetReportCSV(context *fiber.Ctx) error {
+	products, err := services.Product.List()
+
+	if err != nil {
+		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
+			Message: "Error retrieving products",
+			Error:   err.Error(),
+		})
+	}
+
+	file, err := services.Product.GetReportCSV(products)
+
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
+			Message: "Error generating csv",
+			Error:   err.Error(),
+		})
+	}
+
+	context.Response().Header.Set("Content-Type", "application/csv")
+	return context.Send(file)
+}
+
+func (controller *ProductController) GetReportXLSX(context *fiber.Ctx) error {
+	products, err := services.Product.List()
+
+	if err != nil {
+		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
+			Message: "Error retrieving products",
+			Error:   err.Error(),
+		})
+	}
+
+	file, err := services.Product.GetReportXLSX(products)
+
+	if err != nil {
+		return context.Status(fiber.StatusBadRequest).JSON(types.ErrorResponse{
+			Message: "Error generating xlsx",
+			Error:   err.Error(),
+		})
+	}
+
+	context.Response().Header.Set(
+		"Content-Type",
+		"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+	)
 	return context.Send(file)
 }
