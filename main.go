@@ -3,7 +3,6 @@ package main
 import (
 	"risqlac-api/database"
 	"risqlac-api/environment"
-	"risqlac-api/routes"
 )
 
 func main() {
@@ -11,7 +10,7 @@ func main() {
 	database.Connect()
 
 	server.Setup()
-	routes.User.Load(server.App)
-	routes.Product.Load(server.App)
+	server.LoadUserRoutes()
+	server.LoadProductRoutes()
 	server.Start()
 }

@@ -11,7 +11,7 @@ type ProductController struct{}
 
 var Product ProductController
 
-func (controller *ProductController) Create(context *fiber.Ctx) error {
+func (_ *ProductController) Create(context *fiber.Ctx) error {
 	var product types.Product
 	err := context.BodyParser(&product)
 
@@ -45,7 +45,7 @@ func (controller *ProductController) Create(context *fiber.Ctx) error {
 	})
 }
 
-func (controller *ProductController) Update(context *fiber.Ctx) error {
+func (_ *ProductController) Update(context *fiber.Ctx) error {
 	var product types.Product
 	err := context.BodyParser(&product)
 
@@ -79,7 +79,7 @@ func (controller *ProductController) Update(context *fiber.Ctx) error {
 	})
 }
 
-func (controller *ProductController) List(context *fiber.Ctx) error {
+func (_ *ProductController) List(context *fiber.Ctx) error {
 	var query types.ByIdRequest
 	err := context.QueryParser(&query)
 
@@ -126,7 +126,7 @@ func (controller *ProductController) List(context *fiber.Ctx) error {
 	})
 }
 
-func (controller *ProductController) Delete(context *fiber.Ctx) error {
+func (_ *ProductController) Delete(context *fiber.Ctx) error {
 	var query types.ByIdRequest
 	err := context.QueryParser(&query)
 
@@ -160,7 +160,7 @@ func (controller *ProductController) Delete(context *fiber.Ctx) error {
 	})
 }
 
-func (controller *ProductController) GetReportPDF(context *fiber.Ctx) error {
+func (_ *ProductController) GetReportPDF(context *fiber.Ctx) error {
 	products, err := services.Product.List()
 
 	if err != nil {
@@ -183,7 +183,7 @@ func (controller *ProductController) GetReportPDF(context *fiber.Ctx) error {
 	return context.Send(file)
 }
 
-func (controller *ProductController) GetReportCSV(context *fiber.Ctx) error {
+func (_ *ProductController) GetReportCSV(context *fiber.Ctx) error {
 	products, err := services.Product.List()
 
 	if err != nil {
@@ -206,7 +206,7 @@ func (controller *ProductController) GetReportCSV(context *fiber.Ctx) error {
 	return context.Send(file)
 }
 
-func (controller *ProductController) GetReportXLSX(context *fiber.Ctx) error {
+func (_ *ProductController) GetReportXLSX(context *fiber.Ctx) error {
 	products, err := services.Product.List()
 
 	if err != nil {

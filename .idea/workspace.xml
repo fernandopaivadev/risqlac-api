@@ -5,12 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bc8e91db-f58c-4d95-afc6-e30afcbf1b83" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/product.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/product.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/product.go" beforeDir="false" afterPath="$PROJECT_DIR$/routes/product.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/product.go" beforeDir="false" afterPath="$PROJECT_DIR$/services/product.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/middleware.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes.go" beforeDir="false" afterPath="$PROJECT_DIR$/routes.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/product.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/user.go" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
