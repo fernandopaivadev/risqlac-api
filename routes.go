@@ -4,7 +4,7 @@ import (
 	"risqlac-api/controllers"
 )
 
-func (server *Server) LoadUserRoutes() {
+func (server *server) LoadUserRoutes() {
 	userRoutes := server.App.Group("/user")
 
 	userRoutes.Get(
@@ -17,7 +17,7 @@ func (server *Server) LoadUserRoutes() {
 	)
 	userRoutes.Get(
 		"/change-password",
-		middleware.ValidateToken,
+		Middleware.ValidateToken,
 		controllers.User.ChangePassword,
 	)
 	userRoutes.Post(
@@ -27,60 +27,60 @@ func (server *Server) LoadUserRoutes() {
 	)
 	userRoutes.Put(
 		"/update",
-		middleware.ValidateToken,
+		Middleware.ValidateToken,
 		controllers.User.Update,
 	)
 	userRoutes.Get(
 		"/list",
-		middleware.ValidateToken,
+		Middleware.ValidateToken,
 		controllers.User.List,
 	)
 	userRoutes.Delete(
 		"/delete",
-		middleware.ValidateToken,
+		Middleware.ValidateToken,
 		controllers.User.Delete,
 	)
 }
 
-func (server *Server) LoadProductRoutes() {
+func (server *server) LoadProductRoutes() {
 	productRoutes := server.App.Group("/product")
 
 	productRoutes.Post(
 		"/create",
-		middleware.ValidateToken,
-		middleware.VerifyAdmin,
+		Middleware.ValidateToken,
+		Middleware.VerifyAdmin,
 		controllers.Product.Create,
 	)
 	productRoutes.Put(
 		"/update",
-		middleware.ValidateToken,
-		middleware.VerifyAdmin,
+		Middleware.ValidateToken,
+		Middleware.VerifyAdmin,
 		controllers.Product.Update,
 	)
 	productRoutes.Get(
 		"/list",
-		middleware.ValidateToken,
+		Middleware.ValidateToken,
 		controllers.Product.List,
 	)
 	productRoutes.Delete(
 		"/delete",
-		middleware.ValidateToken,
-		middleware.VerifyAdmin,
+		Middleware.ValidateToken,
+		Middleware.VerifyAdmin,
 		controllers.Product.Delete,
 	)
 	productRoutes.Get(
 		"/report/pdf",
-		middleware.ValidateToken,
+		Middleware.ValidateToken,
 		controllers.Product.GetReportPDF,
 	)
 	productRoutes.Get(
 		"/report/csv",
-		middleware.ValidateToken,
+		Middleware.ValidateToken,
 		controllers.Product.GetReportCSV,
 	)
 	productRoutes.Get(
 		"/report/xlsx",
-		middleware.ValidateToken,
+		Middleware.ValidateToken,
 		controllers.Product.GetReportXLSX,
 	)
 }

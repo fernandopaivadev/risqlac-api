@@ -8,11 +8,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type UserController struct{}
+type userController struct{}
 
-var User UserController
+var User userController
 
-func (_ *UserController) Login(context *fiber.Ctx) error {
+func (*userController) Login(context *fiber.Ctx) error {
 	var query types.UserAuthRequest
 	err := context.QueryParser(&query)
 
@@ -46,7 +46,7 @@ func (_ *UserController) Login(context *fiber.Ctx) error {
 	})
 }
 
-func (_ *UserController) RequestPasswordChange(context *fiber.Ctx) error {
+func (*userController) RequestPasswordChange(context *fiber.Ctx) error {
 	var query types.RequestPasswordChangeRequest
 	err := context.QueryParser(&query)
 
@@ -99,7 +99,7 @@ func (_ *UserController) RequestPasswordChange(context *fiber.Ctx) error {
 	})
 }
 
-func (_ *UserController) ChangePassword(context *fiber.Ctx) error {
+func (*userController) ChangePassword(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
 	tokenUserId, err := strconv.ParseUint(requestHeaders["UserId"], 10, 64)
 
@@ -143,7 +143,7 @@ func (_ *UserController) ChangePassword(context *fiber.Ctx) error {
 	})
 }
 
-func (_ *UserController) Create(context *fiber.Ctx) error {
+func (*userController) Create(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
 	isAdmin := requestHeaders["IsAdmin"] == "true"
 
@@ -184,7 +184,7 @@ func (_ *UserController) Create(context *fiber.Ctx) error {
 	})
 }
 
-func (_ *UserController) Update(context *fiber.Ctx) error {
+func (*userController) Update(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
 	isAdmin := requestHeaders["IsAdmin"] == "true"
 	tokenUserId, err := strconv.ParseUint(requestHeaders["UserId"], 10, 64)
@@ -236,7 +236,7 @@ func (_ *UserController) Update(context *fiber.Ctx) error {
 	})
 }
 
-func (_ *UserController) List(context *fiber.Ctx) error {
+func (*userController) List(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
 	isAdmin := requestHeaders["IsAdmin"] == "true"
 	tokenUserId, err := strconv.ParseUint(requestHeaders["UserId"], 10, 64)
@@ -307,7 +307,7 @@ func (_ *UserController) List(context *fiber.Ctx) error {
 	})
 }
 
-func (_ *UserController) Delete(context *fiber.Ctx) error {
+func (*userController) Delete(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
 	isAdmin := requestHeaders["IsAdmin"] == "true"
 	tokenUserId, err := strconv.ParseUint(requestHeaders["UserId"], 10, 64)

@@ -1,7 +1,8 @@
 package main
 
 import (
-	"risqlac-api/environment"
+	"errors"
+	"risqlac-api/infra"
 	"time"
 
 	"github.com/goccy/go-json"
@@ -14,13 +15,13 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 )
 
-type Server struct {
+type server struct {
 	App *fiber.App
 }
 
-var server Server
+var Server server
 
-func (server *Server) Setup() {
+func (server *server) Setup() {
 	server.App = fiber.New(fiber.Config{
 		JSONEncoder: json.Marshal,
 		JSONDecoder: json.Unmarshal,
@@ -48,12 +49,14 @@ func (server *Server) Setup() {
 	}))
 }
 
-func (server *Server) Start() {
-	serverPort := ":" + environment.Variables.ServerPort
+func (server *server) Start() error {
+	serverPort := ":" + infra.Environment.Variables.ServerPort
 
 	err := server.App.Listen(serverPort)
 
 	if err != nil {
-		panic("Error starting Server: " + err.Error())
+		return errors.New("error starting server: " + err.Error())
 	}
+
+	return nil
 }

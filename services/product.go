@@ -3,23 +3,24 @@ package services
 import (
 	"bytes"
 	"encoding/csv"
-	"fmt"
+	"log"
+	"risqlac-api/infra"
+	"risqlac-api/types"
+	"strconv"
+	"time"
+
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
 	"github.com/xuri/excelize/v2"
-	"risqlac-api/database"
-	"risqlac-api/types"
-	"strconv"
-	"time"
 )
 
-type ProductService struct{}
+type productService struct{}
 
-var Product ProductService
+var Product productService
 
-func (_ *ProductService) Create(product types.Product) error {
-	result := database.Instance.Create(&product)
+func (*productService) Create(product types.Product) error {
+	result := infra.Database.Instance.Create(&product)
 
 	if result.Error != nil {
 		return result.Error
@@ -28,8 +29,8 @@ func (_ *ProductService) Create(product types.Product) error {
 	return nil
 }
 
-func (_ *ProductService) Update(user types.Product) error {
-	result := database.Instance.Model(&user).Select("*").Updates(types.Product{
+func (*productService) Update(user types.Product) error {
+	result := infra.Database.Instance.Model(&user).Select("*").Updates(types.Product{
 		Name:            user.Name,
 		Synonym:         user.Synonym,
 		Class:           user.Class,
@@ -51,10 +52,10 @@ func (_ *ProductService) Update(user types.Product) error {
 	return nil
 }
 
-func (_ *ProductService) GetById(productId uint64) (types.Product, error) {
+func (*productService) GetById(productId uint64) (types.Product, error) {
 	var product types.Product
 
-	result := database.Instance.First(&product, productId)
+	result := infra.Database.Instance.First(&product, productId)
 
 	if result.Error != nil {
 		return types.Product{}, result.Error
@@ -63,10 +64,10 @@ func (_ *ProductService) GetById(productId uint64) (types.Product, error) {
 	return product, nil
 }
 
-func (_ *ProductService) List() ([]types.Product, error) {
+func (*productService) List() ([]types.Product, error) {
 	var products []types.Product
 
-	result := database.Instance.Find(&products)
+	result := infra.Database.Instance.Find(&products)
 
 	if result.Error != nil {
 		return []types.Product{}, result.Error
@@ -75,8 +76,8 @@ func (_ *ProductService) List() ([]types.Product, error) {
 	return products, nil
 }
 
-func (_ *ProductService) Delete(productId uint64) error {
-	result := database.Instance.Delete(&types.Product{}, productId)
+func (*productService) Delete(productId uint64) error {
+	result := infra.Database.Instance.Delete(&types.Product{}, productId)
 
 	if result.Error != nil {
 		return result.Error
@@ -138,7 +139,7 @@ func formatDatetime(datetime time.Time) string {
 	return datetime.Local().Format("02/01/2006")
 }
 
-func (_ *ProductService) GetReportPDF(products []types.Product) ([]byte, error) {
+func (*productService) GetReportPDF(products []types.Product) ([]byte, error) {
 	maroto := pdf.NewMaroto(consts.Portrait, consts.A4)
 	maroto.SetPageMargins(20, 5, 20)
 	maroto.SetTitle("Relatório de Produtos", true)
@@ -170,7 +171,7 @@ func (_ *ProductService) GetReportPDF(products []types.Product) ([]byte, error) 
 	return file.Bytes(), nil
 }
 
-func (_ *ProductService) GetReportCSV(products []types.Product) ([]byte, error) {
+func (*productService) GetReportCSV(products []types.Product) ([]byte, error) {
 	rows := [][]string{
 		{
 			"Nome",
@@ -213,7 +214,7 @@ func (_ *ProductService) GetReportCSV(products []types.Product) ([]byte, error) 
 	return buffer.Bytes(), nil
 }
 
-func (_ *ProductService) GetReportXLSX(products []types.Product) ([]byte, error) {
+func (*productService) GetReportXLSX(products []types.Product) ([]byte, error) {
 	rows := [][]string{
 		{
 			"Nome",
@@ -252,7 +253,7 @@ func (_ *ProductService) GetReportXLSX(products []types.Product) ([]byte, error)
 		err := file.Close()
 
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 	}()
 

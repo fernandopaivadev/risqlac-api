@@ -2,16 +2,17 @@ package main
 
 import (
 	"fmt"
-	"github.com/gofiber/fiber/v2"
 	"risqlac-api/services"
 	"risqlac-api/types"
+
+	"github.com/gofiber/fiber/v2"
 )
 
-type Middleware struct{}
+type middleware struct{}
 
-var middleware Middleware
+var Middleware middleware
 
-func (_ *Middleware) ValidateToken(context *fiber.Ctx) error {
+func (*middleware) ValidateToken(context *fiber.Ctx) error {
 	headers := context.GetReqHeaders()
 	tokenString := headers["Authorization"]
 	claims, err := services.User.ParseToken(tokenString)
@@ -38,7 +39,7 @@ func (_ *Middleware) ValidateToken(context *fiber.Ctx) error {
 	return context.Next()
 }
 
-func (_ *Middleware) VerifyAdmin(context *fiber.Ctx) error {
+func (*middleware) VerifyAdmin(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
 	isAdmin := requestHeaders["IsAdmin"] == "true"
 

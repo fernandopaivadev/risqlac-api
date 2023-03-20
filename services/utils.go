@@ -1,23 +1,24 @@
 package services
 
 import (
+	"risqlac-api/infra"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/pkg/errors"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
-	"risqlac-api/environment"
 )
 
-type UtilsService struct{}
+type utilsService struct{}
 
-var Utils UtilsService
+var Utils utilsService
 
-func (_ *UtilsService) ValidateStruct(data interface{}) error {
+func (*utilsService) ValidateStruct(data interface{}) error {
 	validate := validator.New()
 	return validate.Struct(data)
 }
 
-func (_ *UtilsService) SendEmail(
+func (*utilsService) SendEmail(
 	receiverName string,
 	receiverEmailAddress string,
 	subject string,
@@ -29,7 +30,7 @@ func (_ *UtilsService) SendEmail(
 
 	message := mail.NewSingleEmail(from, subject, to, plainTextContent, htmlContent)
 
-	client := sendgrid.NewSendClient(environment.Variables.SendgridApiKey)
+	client := sendgrid.NewSendClient(infra.Environment.Variables.SendgridApiKey)
 	response, err := client.Send(message)
 
 	if err != nil {

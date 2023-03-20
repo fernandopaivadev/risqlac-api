@@ -22,5 +22,12 @@
 			"column": 80,
 			"color": "#0055aa"
 		}
-	]
+	],
+
+	"terminal.integrated.profiles.windows": {
+		"Git Bash": {
+			"source": "Git Bash"
+		}
+	},
+	"terminal.integrated.defaultProfile.windows":"Git Bash"
 }

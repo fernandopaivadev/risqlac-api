@@ -1,16 +1,26 @@
 package main
 
 import (
-	"risqlac-api/database"
-	"risqlac-api/environment"
+	"log"
+	"risqlac-api/infra"
 )
 
 func main() {
-	environment.Load()
-	database.Connect()
+	infra.Environment.Load()
 
-	server.Setup()
-	server.LoadUserRoutes()
-	server.LoadProductRoutes()
-	server.Start()
+	err := infra.Database.Connect()
+
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+
+	Server.Setup()
+	Server.LoadUserRoutes()
+	Server.LoadProductRoutes()
+
+	err = Server.Start()
+
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
 }
