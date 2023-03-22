@@ -23,9 +23,9 @@ var Environment environment
 func (environment *environment) Load() {
 	err := godotenv.Load()
 
-	if err != nil {
+	if err == nil {
 		log.Println(
-			"Error loading environment variables from .env file => " + err.Error(),
+			"Environment variables loaded from .env file",
 		)
 	}
 

@@ -32,7 +32,7 @@ func (*userController) Login(context *fiber.Ctx) error {
 		})
 	}
 
-	token, err := services.User.GenerateToken(query.Email, query.Password)
+	token, err := services.User.GenerateLoginToken(query.Email, query.Password)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{

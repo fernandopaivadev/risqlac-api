@@ -15,7 +15,7 @@ var Middleware middleware
 func (*middleware) ValidateToken(context *fiber.Ctx) error {
 	headers := context.GetReqHeaders()
 	tokenString := headers["Authorization"]
-	claims, err := services.User.ParseToken(tokenString)
+	claims, err := services.Utils.ParseToken(tokenString)
 
 	if err != nil {
 		return context.Status(fiber.StatusUnauthorized).JSON(types.ErrorResponse{
