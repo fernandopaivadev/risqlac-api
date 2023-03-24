@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/go-playground/validator/v10 v10.12.0
 	github.com/goccy/go-json v0.10.2
-	github.com/gofiber/fiber/v2 v2.42.0
+	github.com/gofiber/fiber/v2 v2.43.0
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/johnfercher/maroto v0.40.0
 	github.com/joho/godotenv v1.5.1
