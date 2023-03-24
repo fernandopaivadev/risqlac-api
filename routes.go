@@ -17,12 +17,11 @@ func (server *server) LoadUserRoutes() {
 	)
 	userRoutes.Get(
 		"/change-password",
-		Middleware.ValidateToken,
 		controllers.User.ChangePassword,
 	)
 	userRoutes.Post(
 		"/create",
-		// middleware.ValidateToken,
+		Middleware.ValidateToken,
 		controllers.User.Create,
 	)
 	userRoutes.Put(

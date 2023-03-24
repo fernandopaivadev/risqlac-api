@@ -78,6 +78,7 @@ func (*utilsService) SendEmail(
 	message := mail.NewSingleEmail(from, subject, to, plainTextContent, htmlContent)
 
 	client := sendgrid.NewSendClient(infra.Environment.Variables.SendgridApiKey)
+
 	response, err := client.Send(message)
 
 	if err != nil {

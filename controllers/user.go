@@ -84,15 +84,20 @@ func (*userController) RequestPasswordChange(context *fiber.Ctx) error {
 		})
 	}
 
-	go func() {
-		_ = services.Utils.SendEmail(
-			user.Name,
-			user.Email,
-			"RECUPERAÇÃO DE SENHA",
-			"TOKEN DE RECUPERAÇÃO: "+token,
-			"",
-		)
-	}()
+	err = services.Utils.SendEmail(
+		user.Name,
+		user.Email,
+		"RECUPERAÇÃO DE SENHA",
+		"TOKEN DE RECUPERAÇÃO: "+token,
+		"",
+	)
+
+	if err != nil {
+		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
+			Message: "Error sending email",
+			Error:   err.Error(),
+		})
+	}
 
 	return context.Status(fiber.StatusAccepted).JSON(types.SuccessResponse{
 		Message: "Password recovery email sent",
