@@ -41,7 +41,7 @@ func (*middleware) ValidateToken(context *fiber.Ctx) error {
 
 func (*middleware) VerifyAdmin(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
-	isAdmin := requestHeaders["IsAdmin"] == "true"
+	isAdmin := requestHeaders["Isadmin"] == "true"
 
 	if !isAdmin {
 		return context.Status(fiber.StatusForbidden).JSON(types.MessageResponse{

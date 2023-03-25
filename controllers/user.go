@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"risqlac-api/services"
 	"risqlac-api/types"
 	"strconv"
@@ -106,7 +107,7 @@ func (*userController) RequestPasswordChange(context *fiber.Ctx) error {
 
 func (*userController) ChangePassword(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
-	tokenUserId, err := strconv.ParseUint(requestHeaders["UserId"], 10, 64)
+	tokenUserId, err := strconv.ParseUint(requestHeaders["Userid"], 10, 64)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -150,7 +151,7 @@ func (*userController) ChangePassword(context *fiber.Ctx) error {
 
 func (*userController) Create(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
-	isAdmin := requestHeaders["IsAdmin"] == "true"
+	isAdmin := requestHeaders["Isadmin"] == "true"
 
 	var user types.User
 	err := context.BodyParser(&user)
@@ -191,8 +192,8 @@ func (*userController) Create(context *fiber.Ctx) error {
 
 func (*userController) Update(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
-	isAdmin := requestHeaders["IsAdmin"] == "true"
-	tokenUserId, err := strconv.ParseUint(requestHeaders["UserId"], 10, 64)
+	isAdmin := requestHeaders["Isadmin"] == "true"
+	tokenUserId, err := strconv.ParseUint(requestHeaders["Userid"], 10, 64)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -243,8 +244,10 @@ func (*userController) Update(context *fiber.Ctx) error {
 
 func (*userController) List(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
-	isAdmin := requestHeaders["IsAdmin"] == "true"
-	tokenUserId, err := strconv.ParseUint(requestHeaders["UserId"], 10, 64)
+	isAdmin := requestHeaders["Isadmin"] == "true"
+	tokenUserId, err := strconv.ParseUint(requestHeaders["Userid"], 10, 64)
+
+	fmt.Println(requestHeaders)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
@@ -314,8 +317,8 @@ func (*userController) List(context *fiber.Ctx) error {
 
 func (*userController) Delete(context *fiber.Ctx) error {
 	requestHeaders := context.GetReqHeaders()
-	isAdmin := requestHeaders["IsAdmin"] == "true"
-	tokenUserId, err := strconv.ParseUint(requestHeaders["UserId"], 10, 64)
+	isAdmin := requestHeaders["Isadmin"] == "true"
+	tokenUserId, err := strconv.ParseUint(requestHeaders["Userid"], 10, 64)
 
 	if err != nil {
 		return context.Status(fiber.StatusInternalServerError).JSON(types.ErrorResponse{
