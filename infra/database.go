@@ -2,7 +2,7 @@ package infra
 
 import (
 	"errors"
-	"risqlac-api/types"
+	"risqlac-api/models"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -16,16 +16,19 @@ var Database database
 
 func (database *database) Connect() error {
 	db, err := gorm.Open(sqlite.Open(Environment.Variables.DatabaseFile), &gorm.Config{})
+
 	if err != nil {
 		return errors.New("failed to connect to the database")
 	}
 
-	err = db.AutoMigrate(&types.User{})
+	err = db.AutoMigrate(&models.User{})
+
 	if err != nil {
 		return errors.New("Error migrating model => " + err.Error())
 	}
 
-	err = db.AutoMigrate(&types.Product{})
+	err = db.AutoMigrate(&models.Product{})
+
 	if err != nil {
 		return errors.New("Error migrating model => " + err.Error())
 	}

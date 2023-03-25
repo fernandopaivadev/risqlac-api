@@ -2,10 +2,12 @@ package services
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/csv"
 	"log"
+	"risqlac-api/assets"
 	"risqlac-api/infra"
-	"risqlac-api/types"
+	"risqlac-api/models"
 	"strconv"
 	"time"
 
@@ -19,7 +21,7 @@ type productService struct{}
 
 var Product productService
 
-func (*productService) Create(product types.Product) error {
+func (*productService) Create(product models.Product) error {
 	result := infra.Database.Instance.Create(&product)
 
 	if result.Error != nil {
@@ -29,20 +31,20 @@ func (*productService) Create(product types.Product) error {
 	return nil
 }
 
-func (*productService) Update(user types.Product) error {
-	result := infra.Database.Instance.Model(&user).Select("*").Updates(types.Product{
-		Name:            user.Name,
-		Synonym:         user.Synonym,
-		Class:           user.Class,
-		Subclass:        user.Subclass,
-		Storage:         user.Storage,
-		Incompatibility: user.Incompatibility,
-		Precautions:     user.Precautions,
-		Symbols:         user.Symbols,
-		Batch:           user.Batch,
-		DueDate:         user.DueDate,
-		Location:        user.Location,
-		Quantity:        user.Quantity,
+func (*productService) Update(product models.Product) error {
+	result := infra.Database.Instance.Model(&product).Select("*").Updates(models.Product{
+		Name:            product.Name,
+		Synonym:         product.Synonym,
+		Class:           product.Class,
+		Subclass:        product.Subclass,
+		Storage:         product.Storage,
+		Incompatibility: product.Incompatibility,
+		Precautions:     product.Precautions,
+		Symbols:         product.Symbols,
+		Batch:           product.Batch,
+		DueDate:         product.DueDate,
+		Location:        product.Location,
+		Quantity:        product.Quantity,
 	})
 
 	if result.Error != nil {
@@ -52,32 +54,32 @@ func (*productService) Update(user types.Product) error {
 	return nil
 }
 
-func (*productService) GetById(productId uint64) (types.Product, error) {
-	var product types.Product
+func (*productService) GetById(productId uint64) (models.Product, error) {
+	var product models.Product
 
 	result := infra.Database.Instance.First(&product, productId)
 
 	if result.Error != nil {
-		return types.Product{}, result.Error
+		return models.Product{}, result.Error
 	}
 
 	return product, nil
 }
 
-func (*productService) List() ([]types.Product, error) {
-	var products []types.Product
+func (*productService) List() ([]models.Product, error) {
+	var products []models.Product
 
 	result := infra.Database.Instance.Find(&products)
 
 	if result.Error != nil {
-		return []types.Product{}, result.Error
+		return []models.Product{}, result.Error
 	}
 
 	return products, nil
 }
 
 func (*productService) Delete(productId uint64) error {
-	result := infra.Database.Instance.Delete(&types.Product{}, productId)
+	result := infra.Database.Instance.Delete(&models.Product{}, productId)
 
 	if result.Error != nil {
 		return result.Error
@@ -118,10 +120,12 @@ func makeTitle(maroto pdf.Maroto, title string) {
 	})
 }
 
-func makeImage(maroto pdf.Maroto, path string) {
+func makeImage(maroto pdf.Maroto, image []byte) {
+	base64Image := base64.StdEncoding.EncodeToString(image)
+
 	maroto.Row(20.0, func() {
 		maroto.Col(13.0, func() {
-			_ = maroto.FileImage(path, props.Rect{
+			_ = maroto.Base64Image(base64Image, consts.Png, props.Rect{
 				Left:    0,
 				Top:     0,
 				Percent: 0,
@@ -139,12 +143,12 @@ func formatDatetime(datetime time.Time) string {
 	return datetime.Local().Format("02/01/2006")
 }
 
-func (*productService) GetReportPDF(products []types.Product) ([]byte, error) {
+func (*productService) GetReportPDF(products []models.Product) ([]byte, error) {
 	maroto := pdf.NewMaroto(consts.Portrait, consts.A4)
 	maroto.SetPageMargins(20, 5, 20)
 	maroto.SetTitle("Relatório de Produtos", true)
 
-	makeImage(maroto, "./assets/logo.png")
+	makeImage(maroto, assets.LogoRisQLAC)
 	makeTitle(maroto, "Relatório de Produtos")
 
 	for i := range products {
@@ -171,7 +175,7 @@ func (*productService) GetReportPDF(products []types.Product) ([]byte, error) {
 	return file.Bytes(), nil
 }
 
-func (*productService) GetReportCSV(products []types.Product) ([]byte, error) {
+func (*productService) GetReportCSV(products []models.Product) ([]byte, error) {
 	rows := [][]string{
 		{
 			"Nome",
@@ -214,7 +218,7 @@ func (*productService) GetReportCSV(products []types.Product) ([]byte, error) {
 	return buffer.Bytes(), nil
 }
 
-func (*productService) GetReportXLSX(products []types.Product) ([]byte, error) {
+func (*productService) GetReportXLSX(products []models.Product) ([]byte, error) {
 	rows := [][]string{
 		{
 			"Nome",

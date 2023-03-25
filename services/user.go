@@ -2,7 +2,7 @@ package services
 
 import (
 	"risqlac-api/infra"
-	"risqlac-api/types"
+	"risqlac-api/models"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -18,7 +18,7 @@ type tokenClaims struct {
 }
 
 func (service *userService) GenerateLoginToken(email string, password string) (string, error) {
-	var user types.User
+	var user models.User
 
 	user, err := service.GetByEmail(email)
 
@@ -48,7 +48,7 @@ func (service *userService) GenerateLoginToken(email string, password string) (s
 }
 
 func (service *userService) GeneratePasswordChangeToken(email string) (string, error) {
-	var user types.User
+	var user models.User
 
 	user, err := service.GetByEmail(email)
 
@@ -78,9 +78,9 @@ func (*userService) ChangePassword(userId uint64, newPassword string) error {
 		return err
 	}
 
-	result := infra.Database.Instance.Model(&types.User{
+	result := infra.Database.Instance.Model(&models.User{
 		Id: userId,
-	}).Updates(types.User{
+	}).Updates(models.User{
 		Password: string(passwordHash),
 	})
 
@@ -91,7 +91,7 @@ func (*userService) ChangePassword(userId uint64, newPassword string) error {
 	return nil
 }
 
-func (*userService) Create(user types.User) error {
+func (*userService) Create(user models.User) error {
 	passwordHash, err := bcrypt.GenerateFromPassword(
 		[]byte(user.Password),
 		bcrypt.DefaultCost,
@@ -112,7 +112,7 @@ func (*userService) Create(user types.User) error {
 	return nil
 }
 
-func (*userService) Update(user types.User) error {
+func (*userService) Update(user models.User) error {
 	result := infra.Database.Instance.Model(&user).Select(
 		"Email", "Name", "Phone", "Is_admin",
 	).Updates(&user)
@@ -124,46 +124,46 @@ func (*userService) Update(user types.User) error {
 	return nil
 }
 
-func (*userService) GetById(userId uint64) (types.User, error) {
-	var user types.User
+func (*userService) GetById(userId uint64) (models.User, error) {
+	var user models.User
 
 	result := infra.Database.Instance.First(&user, userId)
 
 	if result.Error != nil {
-		return types.User{}, result.Error
+		return models.User{}, result.Error
 	}
 
 	return user, nil
 }
 
-func (*userService) GetByEmail(email string) (types.User, error) {
-	var user types.User
+func (*userService) GetByEmail(email string) (models.User, error) {
+	var user models.User
 
-	result := infra.Database.Instance.Where(&types.User{
+	result := infra.Database.Instance.Where(&models.User{
 		Email: email,
 	}).First(&user)
 
 	if result.Error != nil {
-		return types.User{}, result.Error
+		return models.User{}, result.Error
 	}
 
 	return user, nil
 }
 
-func (*userService) List() ([]types.User, error) {
-	var users []types.User
+func (*userService) List() ([]models.User, error) {
+	var users []models.User
 
 	result := infra.Database.Instance.Find(&users)
 
 	if result.Error != nil {
-		return []types.User{}, result.Error
+		return []models.User{}, result.Error
 	}
 
 	return users, nil
 }
 
 func (*userService) Delete(userId uint64) error {
-	result := infra.Database.Instance.Delete(&types.User{}, userId)
+	result := infra.Database.Instance.Delete(&models.User{}, userId)
 
 	if result.Error != nil {
 		return result.Error
