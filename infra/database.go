@@ -4,7 +4,7 @@ import (
 	"errors"
 	"risqlac-api/models"
 
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
@@ -15,7 +15,9 @@ type database struct {
 var Database database
 
 func (database *database) Connect() error {
-	db, err := gorm.Open(sqlite.Open(Environment.Variables.DatabaseFile), &gorm.Config{})
+	dsn := Environment.Variables.DatabaseUrl + "?tls=true&parseTime=true"
+
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {
 		return errors.New("failed to connect to the database")

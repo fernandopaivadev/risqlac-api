@@ -10,7 +10,7 @@ import (
 type envVars struct {
 	ServerPort          string
 	JwtSecret           string
-	DatabaseFile        string
+	DatabaseUrl         string
 	TelegramBotApiToken string
 	SendgridApiKey      string
 }
@@ -32,7 +32,7 @@ func (environment *environment) Load() {
 
 	environment.Variables.ServerPort = os.Getenv("SERVER_PORT")
 	environment.Variables.JwtSecret = os.Getenv("JWT_SECRET")
-	environment.Variables.DatabaseFile = os.Getenv("DATABASE_FILE")
+	environment.Variables.DatabaseUrl = os.Getenv("DATABASE_URL")
 	environment.Variables.TelegramBotApiToken = os.Getenv("TELEGRAM_API_TOKEN")
 	environment.Variables.SendgridApiKey = os.Getenv("SENDGRID_API_KEY")
 }
