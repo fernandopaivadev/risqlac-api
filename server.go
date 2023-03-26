@@ -40,7 +40,7 @@ func (server *server) Setup() {
 	}))
 
 	server.App.Get("/info", func(context *fiber.Ctx) error {
-		return context.Status(fiber.StatusOK).SendString("RisQLAC API v2.4.11")
+		return context.Status(fiber.StatusOK).SendString("RisQLAC API v2.4.12")
 	})
 
 	server.App.Get("/metrics", monitor.New(monitor.Config{
