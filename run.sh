@@ -1,12 +1,24 @@
-echo "==START=="
-echo "git reset --hard"
-git reset --hard HEAD~10
-echo "git pull"
+APP_NAME="risqlac-api"
+PORT=3000
+
+echo "==> START <=="
+
+echo "==> git pull"
 git pull
-echo "go mod tidy"
-go mod tidy
-echo "go build -o risqlac-api"
-go build .
-echo "sudo service risqlac-api restart"
-sudo service risqlac-api restart
-echo "==DONE=="
+
+echo "==> stop container"
+podman stop $APP_NAME
+
+echo "==> prune containers"
+podman container prune -f
+
+echo "==> prune images"
+podman image prune -f
+
+echo "==> build image"
+podman build -t $APP_NAME .
+
+echo "==> run image"
+podman run -d --name $APP_NAME -p 3000:$PORT $APP_NAME
+
+echo "==> DONE <=="
