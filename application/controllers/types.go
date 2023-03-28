@@ -1,6 +1,6 @@
 package controllers
 
-import "risqlac-api/models"
+import "risqlac-api/application/models"
 
 type messageResponse struct {
 	Message string `json:"message"`

@@ -1,8 +1,8 @@
-package main
+package application
 
 import (
 	"fmt"
-	"risqlac-api/services"
+	"risqlac-api/application/services"
 
 	"github.com/gofiber/fiber/v2"
 )

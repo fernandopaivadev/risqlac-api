@@ -5,9 +5,9 @@ import (
 	"encoding/base64"
 	"encoding/csv"
 	"log"
-	"risqlac-api/assets"
+	"risqlac-api/application/assets"
+	"risqlac-api/application/models"
 	"risqlac-api/infra"
-	"risqlac-api/models"
 	"strconv"
 	"time"
 

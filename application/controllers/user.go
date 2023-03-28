@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"fmt"
-	"risqlac-api/models"
-	"risqlac-api/services"
+	"risqlac-api/application/models"
+	"risqlac-api/application/services"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"

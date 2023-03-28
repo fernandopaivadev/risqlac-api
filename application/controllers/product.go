@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"risqlac-api/models"
-	"risqlac-api/services"
+	"risqlac-api/application/models"
+	"risqlac-api/application/services"
 
 	"github.com/gofiber/fiber/v2"
 )

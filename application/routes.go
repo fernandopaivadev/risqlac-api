@@ -1,7 +1,7 @@
-package main
+package application
 
 import (
-	"risqlac-api/controllers"
+	"risqlac-api/application/controllers"
 )
 
 func (server *server) LoadUserRoutes() {

@@ -1,8 +1,8 @@
 package services
 
 import (
+	"risqlac-api/application/models"
 	"risqlac-api/infra"
-	"risqlac-api/models"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"

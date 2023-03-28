@@ -2,7 +2,7 @@ package infra
 
 import (
 	"errors"
-	"risqlac-api/models"
+	"risqlac-api/application/models"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

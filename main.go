@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"risqlac-api/application"
 	"risqlac-api/infra"
 )
 
@@ -14,11 +15,11 @@ func main() {
 		log.Fatalln(err.Error())
 	}
 
-	Server.Setup()
-	Server.LoadUserRoutes()
-	Server.LoadProductRoutes()
+	application.Server.Setup()
+	application.Server.LoadUserRoutes()
+	application.Server.LoadProductRoutes()
 
-	err = Server.Start()
+	err = application.Server.Start()
 
 	if err != nil {
 		log.Fatalln(err.Error())
