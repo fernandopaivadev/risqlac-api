@@ -2,7 +2,7 @@ package services
 
 import (
 	"risqlac-api/application/models"
-	"risqlac-api/infra"
+	"risqlac-api/infrastructure"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -78,7 +78,7 @@ func (*userService) ChangePassword(userId uint64, newPassword string) error {
 		return err
 	}
 
-	result := infra.Database.Instance.Model(&models.User{
+	result := infrastructure.Database.Instance.Model(&models.User{
 		Id: userId,
 	}).Updates(models.User{
 		Password: string(passwordHash),
@@ -103,7 +103,7 @@ func (*userService) Create(user models.User) error {
 
 	user.Password = string(passwordHash)
 
-	result := infra.Database.Instance.Create(&user)
+	result := infrastructure.Database.Instance.Create(&user)
 
 	if result.Error != nil {
 		return result.Error
@@ -113,7 +113,7 @@ func (*userService) Create(user models.User) error {
 }
 
 func (*userService) Update(user models.User) error {
-	result := infra.Database.Instance.Model(&user).Select(
+	result := infrastructure.Database.Instance.Model(&user).Select(
 		"Email", "Name", "Phone", "Is_admin",
 	).Updates(&user)
 
@@ -127,7 +127,7 @@ func (*userService) Update(user models.User) error {
 func (*userService) GetById(userId uint64) (models.User, error) {
 	var user models.User
 
-	result := infra.Database.Instance.First(&user, userId)
+	result := infrastructure.Database.Instance.First(&user, userId)
 
 	if result.Error != nil {
 		return models.User{}, result.Error
@@ -139,7 +139,7 @@ func (*userService) GetById(userId uint64) (models.User, error) {
 func (*userService) GetByEmail(email string) (models.User, error) {
 	var user models.User
 
-	result := infra.Database.Instance.Where(&models.User{
+	result := infrastructure.Database.Instance.Where(&models.User{
 		Email: email,
 	}).First(&user)
 
@@ -153,7 +153,7 @@ func (*userService) GetByEmail(email string) (models.User, error) {
 func (*userService) List() ([]models.User, error) {
 	var users []models.User
 
-	result := infra.Database.Instance.Find(&users)
+	result := infrastructure.Database.Instance.Find(&users)
 
 	if result.Error != nil {
 		return []models.User{}, result.Error
@@ -163,7 +163,7 @@ func (*userService) List() ([]models.User, error) {
 }
 
 func (*userService) Delete(userId uint64) error {
-	result := infra.Database.Instance.Delete(&models.User{}, userId)
+	result := infrastructure.Database.Instance.Delete(&models.User{}, userId)
 
 	if result.Error != nil {
 		return result.Error

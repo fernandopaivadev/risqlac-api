@@ -7,7 +7,7 @@ import (
 	"log"
 	"risqlac-api/application/assets"
 	"risqlac-api/application/models"
-	"risqlac-api/infra"
+	"risqlac-api/infrastructure"
 	"strconv"
 	"time"
 
@@ -22,7 +22,7 @@ type productService struct{}
 var Product productService
 
 func (*productService) Create(product models.Product) error {
-	result := infra.Database.Instance.Create(&product)
+	result := infrastructure.Database.Instance.Create(&product)
 
 	if result.Error != nil {
 		return result.Error
@@ -32,7 +32,7 @@ func (*productService) Create(product models.Product) error {
 }
 
 func (*productService) Update(product models.Product) error {
-	result := infra.Database.Instance.Model(&product).Select("*").Updates(models.Product{
+	result := infrastructure.Database.Instance.Model(&product).Select("*").Updates(models.Product{
 		Name:            product.Name,
 		Synonym:         product.Synonym,
 		Class:           product.Class,
@@ -57,7 +57,7 @@ func (*productService) Update(product models.Product) error {
 func (*productService) GetById(productId uint64) (models.Product, error) {
 	var product models.Product
 
-	result := infra.Database.Instance.First(&product, productId)
+	result := infrastructure.Database.Instance.First(&product, productId)
 
 	if result.Error != nil {
 		return models.Product{}, result.Error
@@ -69,7 +69,7 @@ func (*productService) GetById(productId uint64) (models.Product, error) {
 func (*productService) List() ([]models.Product, error) {
 	var products []models.Product
 
-	result := infra.Database.Instance.Find(&products)
+	result := infrastructure.Database.Instance.Find(&products)
 
 	if result.Error != nil {
 		return []models.Product{}, result.Error
@@ -79,7 +79,7 @@ func (*productService) List() ([]models.Product, error) {
 }
 
 func (*productService) Delete(productId uint64) error {
-	result := infra.Database.Instance.Delete(&models.Product{}, productId)
+	result := infrastructure.Database.Instance.Delete(&models.Product{}, productId)
 
 	if result.Error != nil {
 		return result.Error

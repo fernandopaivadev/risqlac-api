@@ -4,13 +4,13 @@ import (
 	"log"
 	"risqlac-api/application"
 	"risqlac-api/environment"
-	"risqlac-api/infra"
+	"risqlac-api/infrastructure"
 )
 
 func main() {
 	environment.Load()
 
-	err := infra.Database.Connect()
+	err := infrastructure.Database.Connect()
 
 	if err != nil {
 		log.Fatalln(err.Error())
