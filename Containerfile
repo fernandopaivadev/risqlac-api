@@ -2,13 +2,14 @@ FROM ubuntu:latest
 
 ENV APP_NAME=risqlac-api
 ENV CGO_ENABLED=1
+ENV GO_VERSION=1.20.2
 
 RUN apt update -y && \
 	apt install -y tar && \
 	apt install -y wget && \
 	apt install -y gcc && \
-	wget https://go.dev/dl/go1.20.2.linux-amd64.tar.gz && \
-	tar -C /usr/local -xzf go1.20.2.linux-amd64.tar.gz && \
+	wget https://go.dev/dl/go$GO_VERSION.linux-amd64.tar.gz && \
+	tar -C /usr/local -xzf go$GO_VERSION.linux-amd64.tar.gz && \
 	export PATH=$PATH:/usr/local/go/bin && \
 	go version
 
