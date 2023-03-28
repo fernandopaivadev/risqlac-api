@@ -3,11 +3,12 @@ package main
 import (
 	"log"
 	"risqlac-api/application"
+	"risqlac-api/environment"
 	"risqlac-api/infra"
 )
 
 func main() {
-	infra.Environment.Load()
+	environment.Load()
 
 	err := infra.Database.Connect()
 

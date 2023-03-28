@@ -2,7 +2,7 @@ package services
 
 import (
 	"encoding/json"
-	"risqlac-api/infra"
+	"risqlac-api/environment"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v4"
@@ -23,7 +23,7 @@ func (*utilsService) GenerateJWT(userId uint64, expiresAt int64) (string, error)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	tokenString, err := token.SignedString([]byte(infra.Environment.Variables.JwtSecret))
+	tokenString, err := token.SignedString([]byte(environment.Variables.JwtSecret))
 
 	if err != nil {
 		return "", err
@@ -34,7 +34,7 @@ func (*utilsService) GenerateJWT(userId uint64, expiresAt int64) (string, error)
 
 func (*utilsService) ParseToken(tokenString string) (tokenClaims, error) {
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
-		return []byte(infra.Environment.Variables.JwtSecret), nil
+		return []byte(environment.Variables.JwtSecret), nil
 	})
 
 	if err != nil {
@@ -77,7 +77,7 @@ func (*utilsService) SendEmail(
 
 	message := mail.NewSingleEmail(from, subject, to, plainTextContent, htmlContent)
 
-	client := sendgrid.NewSendClient(infra.Environment.Variables.SendgridApiKey)
+	client := sendgrid.NewSendClient(environment.Variables.SendgridApiKey)
 
 	response, err := client.Send(message)
 

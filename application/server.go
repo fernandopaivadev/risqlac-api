@@ -2,7 +2,7 @@ package application
 
 import (
 	"errors"
-	"risqlac-api/infra"
+	"risqlac-api/environment"
 	"time"
 
 	"github.com/goccy/go-json"
@@ -40,7 +40,7 @@ func (server *server) Setup() {
 	}))
 
 	server.App.Get("/info", func(context *fiber.Ctx) error {
-		return context.Status(fiber.StatusOK).SendString("RisQLAC API v2.4.20")
+		return context.Status(fiber.StatusOK).SendString("RisQLAC API v2.4.21")
 	})
 
 	server.App.Get("/metrics", monitor.New(monitor.Config{
@@ -50,7 +50,7 @@ func (server *server) Setup() {
 }
 
 func (server *server) Start() error {
-	serverPort := ":" + infra.Environment.Variables.ServerPort
+	serverPort := ":" + environment.Variables.ServerPort
 
 	err := server.App.Listen(serverPort)
 

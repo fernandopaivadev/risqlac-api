@@ -2,7 +2,7 @@ package services
 
 import (
 	"errors"
-	"risqlac-api/infra"
+	"risqlac-api/environment"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -11,7 +11,7 @@ type telegramBotService struct{}
 
 var TelegramBot telegramBotService
 
-var telegramBotApiUrl = "https://api.telegram.org/bot" + infra.Environment.Variables.TelegramBotApiToken
+var telegramBotApiUrl = "https://api.telegram.org/bot" + environment.Variables.TelegramBotApiToken
 
 func (*telegramBotService) SendMessage(chatID string, message string) error {
 	type RequestBody struct {

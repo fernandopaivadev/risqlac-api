@@ -1,8 +1,9 @@
-package infra
+package infrastructure
 
 import (
 	"errors"
 	"risqlac-api/application/models"
+	"risqlac-api/environment"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -15,7 +16,7 @@ type database struct {
 var Database database
 
 func (database *database) Connect() error {
-	dsn := Environment.Variables.DatabaseUrl + "?tls=true&parseTime=true"
+	dsn := environment.Variables.DatabaseUrl + "?tls=true&parseTime=true"
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
