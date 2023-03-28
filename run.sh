@@ -1,24 +1,17 @@
 APP_NAME="risqlac-api"
-PORT=3000
 
-echo "==> START <=="
+echo "==START=="
 
-echo "==> git pull"
+echo "git pull"
 git pull
 
-echo "==> stop container"
-podman stop $APP_NAME
+echo "go mod tidy"
+go mod tidy
 
-echo "==> prune containers"
-podman container prune -f
+echo "build project"
+go build -o $APP_NAME .
 
-echo "==> prune images"
-podman image prune -f
+echo "service restart"
+sudo service $APP_NAME restart
 
-echo "==> build image"
-podman build -t $APP_NAME .
-
-echo "==> run image"
-podman run -d --name $APP_NAME -p 3000:$PORT $APP_NAME
-
-echo "==> DONE <=="
+echo "==DONE=="
