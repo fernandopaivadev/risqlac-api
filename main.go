@@ -17,6 +17,7 @@ func main() {
 	}
 
 	application.Server.Setup()
+	application.Server.LoadMetricsRoutes()
 	application.Server.LoadUserRoutes()
 	application.Server.LoadProductRoutes()
 

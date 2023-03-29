@@ -2,7 +2,22 @@ package application
 
 import (
 	"risqlac-api/application/controllers"
+	"time"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/monitor"
 )
+
+func (server *server) LoadMetricsRoutes() {
+	server.App.Get("/", func(context *fiber.Ctx) error {
+		return context.Status(fiber.StatusOK).SendString("RisQLAC API v2.4.22")
+	})
+
+	server.App.Get("/metrics", monitor.New(monitor.Config{
+		Title:   "RisQLAC API Metrics",
+		Refresh: time.Second * 5,
+	}))
+}
 
 func (server *server) LoadUserRoutes() {
 	userRoutes := server.App.Group("/user")

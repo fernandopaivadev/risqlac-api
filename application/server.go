@@ -3,14 +3,12 @@ package application
 import (
 	"errors"
 	"risqlac-api/environment"
-	"time"
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 )
@@ -37,15 +35,6 @@ func (server *server) Setup() {
 	server.App.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
 		AllowMethods: "GET,POST,HEAD,PUT,DELETE,PATCH,OPTIONS",
-	}))
-
-	server.App.Get("/info", func(context *fiber.Ctx) error {
-		return context.Status(fiber.StatusOK).SendString("RisQLAC API v2.4.21")
-	})
-
-	server.App.Get("/metrics", monitor.New(monitor.Config{
-		Title:   "RisQLAC API Metrics",
-		Refresh: time.Second * 5,
 	}))
 }
 
