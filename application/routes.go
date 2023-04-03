@@ -2,99 +2,92 @@ package application
 
 import (
 	"risqlac-api/application/controllers"
-	"time"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/monitor"
+	"github.com/labstack/echo/v4"
 )
 
 func (server *server) LoadMetricsRoutes() {
-	server.App.Get("/", func(context *fiber.Ctx) error {
-		return context.Status(fiber.StatusOK).SendString("RisQLAC API v2.4.22")
+	server.Instance.GET("/", func(context echo.Context) error {
+		return context.String(200, "RisQLAC API v2.4.22")
 	})
-
-	server.App.Get("/metrics", monitor.New(monitor.Config{
-		Title:   "RisQLAC API Metrics",
-		Refresh: time.Second * 5,
-	}))
 }
 
 func (server *server) LoadUserRoutes() {
-	userRoutes := server.App.Group("/user")
+	userRoutes := server.Instance.Group("/user")
 
-	userRoutes.Get(
+	userRoutes.GET(
 		"/login",
 		controllers.User.Login,
 	)
-	userRoutes.Get(
+	userRoutes.GET(
 		"/request-password-change",
 		controllers.User.RequestPasswordChange,
 	)
-	userRoutes.Get(
+	userRoutes.GET(
 		"/change-password",
 		controllers.User.ChangePassword,
 	)
-	userRoutes.Post(
+	userRoutes.POST(
 		"/create",
-		// Middleware.ValidateToken,
 		controllers.User.Create,
+		// Middleware.ValidateToken,
 	)
-	userRoutes.Put(
+	userRoutes.PUT(
 		"/update",
-		Middleware.ValidateToken,
 		controllers.User.Update,
+		Middleware.ValidateToken,
 	)
-	userRoutes.Get(
+	userRoutes.GET(
 		"/list",
-		Middleware.ValidateToken,
 		controllers.User.List,
-	)
-	userRoutes.Delete(
-		"/delete",
 		Middleware.ValidateToken,
+	)
+	userRoutes.DELETE(
+		"/delete",
 		controllers.User.Delete,
+		Middleware.ValidateToken,
 	)
 }
 
 func (server *server) LoadProductRoutes() {
-	productRoutes := server.App.Group("/product")
+	productRoutes := server.Instance.Group("/product")
 
-	productRoutes.Post(
+	productRoutes.POST(
 		"/create",
-		Middleware.ValidateToken,
-		Middleware.VerifyAdmin,
 		controllers.Product.Create,
+		Middleware.ValidateToken,
+		Middleware.VerifyAdmin,
 	)
-	productRoutes.Put(
+	productRoutes.PUT(
 		"/update",
-		Middleware.ValidateToken,
-		Middleware.VerifyAdmin,
 		controllers.Product.Update,
-	)
-	productRoutes.Get(
-		"/list",
-		Middleware.ValidateToken,
-		controllers.Product.List,
-	)
-	productRoutes.Delete(
-		"/delete",
 		Middleware.ValidateToken,
 		Middleware.VerifyAdmin,
+	)
+	productRoutes.GET(
+		"/list",
+		controllers.Product.List,
+		Middleware.ValidateToken,
+	)
+	productRoutes.DELETE(
+		"/delete",
 		controllers.Product.Delete,
+		Middleware.ValidateToken,
+		Middleware.VerifyAdmin,
 	)
-	productRoutes.Get(
+	productRoutes.GET(
 		"/report/pdf",
-		Middleware.ValidateToken,
 		controllers.Product.GetReportPDF,
+		Middleware.ValidateToken,
 	)
-	productRoutes.Get(
+	productRoutes.GET(
 		"/report/csv",
-		Middleware.ValidateToken,
 		controllers.Product.GetReportCSV,
-	)
-	productRoutes.Get(
-		"/report/xlsx",
 		Middleware.ValidateToken,
+	)
+	productRoutes.GET(
+		"/report/xlsx",
 		controllers.Product.GetReportXLSX,
+		Middleware.ValidateToken,
 	)
 }

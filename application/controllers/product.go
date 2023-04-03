@@ -3,231 +3,212 @@ package controllers
 import (
 	"risqlac-api/application/models"
 	"risqlac-api/application/services"
+	"strconv"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 )
 
 type productController struct{}
 
 var Product productController
 
-func (*productController) Create(context *fiber.Ctx) error {
+func (*productController) Create(context echo.Context) error {
 	var product models.Product
-	err := context.BodyParser(&product)
+	err := context.Bind(&product)
 
 	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error parsing body params",
-			Error:   err.Error(),
+		return context.JSON(500, echo.Map{
+			"message": "error parsing body",
+			"error":   err.Error(),
 		})
 	}
 
 	err = services.Utils.ValidateStruct(product)
 
 	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(errorResponse{
-			Message: "Bad request",
-			Error:   err.Error(),
+		return context.JSON(400, echo.Map{
+			"message": "bad request",
+			"error":   err.Error(),
 		})
 	}
 
 	err = services.Product.Create(product)
 
 	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error creating product",
-			Error:   err.Error(),
+		return context.JSON(500, echo.Map{
+			"message": "error creating product",
+			"error":   err.Error(),
 		})
 	}
 
-	return context.Status(fiber.StatusCreated).JSON(messageResponse{
-		Message: "Product created",
+	return context.JSON(200, echo.Map{
+		"message": "product created",
 	})
 }
 
-func (*productController) Update(context *fiber.Ctx) error {
+func (*productController) Update(context echo.Context) error {
 	var product models.Product
-	err := context.BodyParser(&product)
+	err := context.Bind(&product)
 
 	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error parsing body params",
-			Error:   err.Error(),
+		return context.JSON(500, echo.Map{
+			"message": "error parsing body",
+			"error":   err.Error(),
 		})
 	}
 
 	err = services.Utils.ValidateStruct(product)
 
 	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(errorResponse{
-			Message: "Bad request",
-			Error:   err.Error(),
+		return context.JSON(400, echo.Map{
+			"message": "bad request",
+			"error":   err.Error(),
 		})
 	}
 
 	err = services.Product.Update(product)
 
 	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error updating product",
-			Error:   err.Error(),
+		return context.JSON(500, echo.Map{
+			"message": "error updating product",
+			"error":   err.Error(),
 		})
 	}
 
-	return context.Status(fiber.StatusOK).JSON(messageResponse{
-		Message: "Product updated",
+	return context.JSON(200, echo.Map{
+		"message": "product updated",
 	})
 }
 
-func (*productController) List(context *fiber.Ctx) error {
-	var query byIdRequest
-	err := context.QueryParser(&query)
+func (*productController) List(context echo.Context) error {
+	productId, _ := strconv.ParseUint(context.QueryParam("id"), 10, 64)
 
-	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error parsing query params",
-			Error:   err.Error(),
-		})
-	}
-
-	var products []models.Product
-
-	if query.Id != 0 {
-		product, err := services.Product.GetById(query.Id)
+	if productId != 0 {
+		product, err := services.Product.GetById(productId)
 
 		if err != nil {
-			return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-				Message: "Error retrieving product",
-				Error:   err.Error(),
+			return context.JSON(500, echo.Map{
+				"message": "error retrieving product",
+				"error":   err.Error(),
 			})
 		}
 
-		products = append(products, product)
-	} else {
-		products, err = services.Product.List()
-
-		if err != nil {
-			return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-				Message: "Error retrieving products",
-				Error:   err.Error(),
-			})
-		}
-	}
-
-	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error retrieving products",
-			Error:   err.Error(),
+		return context.JSON(200, echo.Map{
+			"products": []models.Product{product},
 		})
 	}
 
-	return context.Status(fiber.StatusOK).JSON(listProductsResponse{
-		Products: products,
-	})
-}
-
-func (*productController) Delete(context *fiber.Ctx) error {
-	var query byIdRequest
-	err := context.QueryParser(&query)
-
-	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(errorResponse{
-			Message: "Error parsing query params",
-			Error:   err.Error(),
-		})
-	}
-
-	err = services.Utils.ValidateStruct(query)
-
-	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(errorResponse{
-			Message: "Bad request",
-			Error:   err.Error(),
-		})
-	}
-
-	err = services.Product.Delete(query.Id)
-
-	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error deleting product",
-			Error:   err.Error(),
-		})
-	}
-
-	return context.Status(fiber.StatusOK).JSON(messageResponse{
-		Message: "Product deleted",
-	})
-}
-
-func (*productController) GetReportPDF(context *fiber.Ctx) error {
 	products, err := services.Product.List()
 
 	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error retrieving products",
-			Error:   err.Error(),
+		return context.JSON(500, echo.Map{
+			"message": "error retrieving products",
+			"error":   err.Error(),
+		})
+	}
+
+	return context.JSON(200, echo.Map{
+		"products": products,
+	})
+}
+
+func (*productController) Delete(context echo.Context) error {
+	productId, err := strconv.ParseUint(context.QueryParam("id"), 10, 64)
+
+	if err != nil {
+		return context.JSON(400, echo.Map{
+			"message": "bad request",
+			"error":   "id must be a number",
+		})
+	}
+
+	if err != nil {
+		return context.JSON(400, echo.Map{
+			"message": "bad request",
+			"error":   err.Error(),
+		})
+	}
+
+	err = services.Product.Delete(productId)
+
+	if err != nil {
+		return context.JSON(500, echo.Map{
+			"message": "error deleting product",
+			"error":   err.Error(),
+		})
+	}
+
+	return context.JSON(200, echo.Map{
+		"message": "product deleted",
+	})
+}
+
+func (*productController) GetReportPDF(context echo.Context) error {
+	products, err := services.Product.List()
+
+	if err != nil {
+		return context.JSON(500, echo.Map{
+			"message": "error retrieving products",
+			"error":   err.Error(),
 		})
 	}
 
 	file, err := services.Product.GetReportPDF(products)
 
 	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(errorResponse{
-			Message: "Error generating pdf",
-			Error:   err.Error(),
+		return context.JSON(400, echo.Map{
+			"message": "error generating pdf",
+			"error":   err.Error(),
 		})
 	}
 
-	context.Response().Header.Set("Content-Type", "application/pdf")
-	return context.Send(file)
+	return context.Blob(200, "application/pdf", file)
 }
 
-func (*productController) GetReportCSV(context *fiber.Ctx) error {
+func (*productController) GetReportCSV(context echo.Context) error {
 	products, err := services.Product.List()
 
 	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error retrieving products",
-			Error:   err.Error(),
+		return context.JSON(500, echo.Map{
+			"message": "error retrieving products",
+			"error":   err.Error(),
 		})
 	}
 
 	file, err := services.Product.GetReportCSV(products)
 
 	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(errorResponse{
-			Message: "Error generating csv",
-			Error:   err.Error(),
+		return context.JSON(400, echo.Map{
+			"message": "error generating csv",
+			"error":   err.Error(),
 		})
 	}
 
-	context.Response().Header.Set("Content-Type", "application/csv")
-	return context.Send(file)
+	return context.Blob(200, "text/csv", file)
 }
 
-func (*productController) GetReportXLSX(context *fiber.Ctx) error {
+func (*productController) GetReportXLSX(context echo.Context) error {
 	products, err := services.Product.List()
 
 	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error retrieving products",
-			Error:   err.Error(),
+		return context.JSON(500, echo.Map{
+			"message": "error retrieving products",
+			"error":   err.Error(),
 		})
 	}
 
 	file, err := services.Product.GetReportXLSX(products)
 
 	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(errorResponse{
-			Message: "Error generating xlsx",
-			Error:   err.Error(),
+		return context.JSON(400, echo.Map{
+			"message": "error generating xlsx",
+			"error":   err.Error(),
 		})
 	}
 
-	context.Response().Header.Set(
-		"Content-Type",
+	return context.Blob(
+		200,
 		"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+		file,
 	)
-	return context.Send(file)
 }

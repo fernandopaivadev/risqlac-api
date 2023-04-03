@@ -1,87 +1,67 @@
 package controllers
 
 import (
-	"fmt"
 	"risqlac-api/application/models"
 	"risqlac-api/application/services"
 	"strconv"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 )
 
 type userController struct{}
 
 var User userController
 
-func (*userController) Login(context *fiber.Ctx) error {
-	var query userAuthRequest
-	err := context.QueryParser(&query)
+func (*userController) Login(context echo.Context) error {
+	email := context.QueryParam("email")
+	password := context.QueryParam("password")
 
-	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error parsing query params",
-			Error:   err.Error(),
+	if email == "" || password == "" {
+		return context.JSON(400, echo.Map{
+			"message": "bad request",
+			"error":   "email and password are required",
 		})
 	}
 
-	err = services.Utils.ValidateStruct(query)
+	token, err := services.User.GenerateLoginToken(email, password)
 
 	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(errorResponse{
-			Message: "Bad request",
-			Error:   err.Error(),
+		return context.JSON(401, echo.Map{
+			"message": "error validating credentials",
+			"error":   err.Error(),
 		})
 	}
 
-	token, err := services.User.GenerateLoginToken(query.Email, query.Password)
-
-	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error generating token",
-			Error:   err.Error(),
-		})
-	}
-
-	return context.Status(fiber.StatusOK).JSON(userAuthResponse{
-		Token: token,
+	return context.JSON(200, echo.Map{
+		"token": token,
 	})
 }
 
-func (*userController) RequestPasswordChange(context *fiber.Ctx) error {
-	var query requestPasswordChangeRequest
-	err := context.QueryParser(&query)
+func (*userController) RequestPasswordChange(context echo.Context) error {
+	email := context.QueryParam("email")
 
-	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error parsing query params",
-			Error:   err.Error(),
+	if email == "" {
+		return context.JSON(400, echo.Map{
+			"message": "bad request",
+			"error":   "Email is required",
 		})
 	}
 
-	err = services.Utils.ValidateStruct(query)
+	user, err := services.User.GetByEmail(email)
 
 	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(errorResponse{
-			Message: "Bad request",
-			Error:   err.Error(),
-		})
-	}
-
-	user, err := services.User.GetByEmail(query.Email)
-
-	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error retrieving user",
-			Error:   err.Error(),
+		return context.JSON(404, echo.Map{
+			"message": "error retrieving user",
+			"error":   err.Error(),
 		})
 	}
 
 	token, err := services.User.GeneratePasswordChangeToken(user.Email)
 
 	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error generating password change token",
-			Error:   err.Error(),
+		return context.JSON(500, echo.Map{
+			"message": "error generating password change token",
+			"error":   err.Error(),
 		})
 	}
 
@@ -94,72 +74,62 @@ func (*userController) RequestPasswordChange(context *fiber.Ctx) error {
 	)
 
 	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error sending email",
-			Error:   err.Error(),
+		return context.JSON(500, echo.Map{
+			"message": "error sending email",
+			"error":   err.Error(),
 		})
 	}
 
-	return context.Status(fiber.StatusAccepted).JSON(messageResponse{
-		Message: "Password recovery email sent",
+	return context.JSON(200, echo.Map{
+		"message": "password change token sent",
 	})
 }
 
-func (*userController) ChangePassword(context *fiber.Ctx) error {
-	requestHeaders := context.GetReqHeaders()
-	tokenUserId, err := strconv.ParseUint(requestHeaders["Userid"], 10, 64)
+func (*userController) ChangePassword(context echo.Context) error {
+	headers := context.Request().Header
+	tokenUserId, err := strconv.ParseUint(headers["Userid"][0], 10, 64)
 
 	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error parsing token user id",
-			Error:   err.Error(),
+		return context.JSON(500, echo.Map{
+			"message": "error parsing token user id",
+			"error":   err.Error(),
 		})
 	}
 
-	var query changePasswordRequest
-	err = context.QueryParser(&query)
+	password := context.QueryParam("password")
 
-	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error parsing query params",
-			Error:   err.Error(),
+	if password == "" {
+		return context.JSON(400, echo.Map{
+			"message": "bad request",
+			"error":   "password is required",
 		})
 	}
 
-	err = services.Utils.ValidateStruct(query)
+	err = services.User.ChangePassword(tokenUserId, password)
 
 	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(errorResponse{
-			Message: "Bad request",
-			Error:   err.Error(),
+		return context.JSON(500, echo.Map{
+			"message": "error changing user password",
+			"error":   err.Error(),
 		})
 	}
 
-	err = services.User.ChangePassword(tokenUserId, query.Password)
-
-	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error changing user password",
-			Error:   err.Error(),
-		})
-	}
-
-	return context.Status(fiber.StatusOK).JSON(messageResponse{
-		Message: "User password changed",
+	return context.JSON(200, echo.Map{
+		"message": "user password changed",
 	})
 }
 
-func (*userController) Create(context *fiber.Ctx) error {
-	requestHeaders := context.GetReqHeaders()
-	isAdmin := requestHeaders["Isadmin"] == "true"
+func (*userController) Create(context echo.Context) error {
+	headers := context.Request().Header
+	isAdmin := headers["Isadmin"][0] == "true"
 
 	var user models.User
-	err := context.BodyParser(&user)
+	err := context.Bind(&user)
 
 	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(errorResponse{
-			Message: "Error parsing body params",
-			Error:   err.Error(),
+		return context.JSON(400, echo.Map{
+			"message": "bad request",
+			"error":   err.Error(),
 		})
 	}
 
@@ -170,51 +140,51 @@ func (*userController) Create(context *fiber.Ctx) error {
 	err = services.Utils.ValidateStruct(user)
 
 	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(errorResponse{
-			Message: "Bad request",
-			Error:   err.Error(),
+		return context.JSON(400, echo.Map{
+			"message": "bad request",
+			"error":   err.Error(),
 		})
 	}
 
 	err = services.User.Create(user)
 
 	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error creating user",
-			Error:   err.Error(),
+		return context.JSON(500, echo.Map{
+			"message": "error creating user",
+			"error":   err.Error(),
 		})
 	}
 
-	return context.Status(fiber.StatusCreated).JSON(messageResponse{
-		Message: "User created",
+	return context.JSON(200, echo.Map{
+		"message": "user created",
 	})
 }
 
-func (*userController) Update(context *fiber.Ctx) error {
-	requestHeaders := context.GetReqHeaders()
-	isAdmin := requestHeaders["Isadmin"] == "true"
-	tokenUserId, err := strconv.ParseUint(requestHeaders["Userid"], 10, 64)
+func (*userController) Update(context echo.Context) error {
+	headers := context.Request().Header
+	isAdmin := headers["Isadmin"][0] == "true"
+	tokenUserId, err := strconv.ParseUint(headers["Userid"][0], 10, 64)
 
 	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error parsing token user id",
-			Error:   err.Error(),
+		return context.JSON(500, echo.Map{
+			"message": "error parsing token user id",
+			"error":   err.Error(),
 		})
 	}
 
 	var user models.User
-	err = context.BodyParser(&user)
+	err = context.Bind(&user)
 
 	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error parsing body params",
-			Error:   err.Error(),
+		return context.JSON(500, echo.Map{
+			"message": "error parsing body",
+			"error":   err.Error(),
 		})
 	}
 
 	if !(isAdmin || tokenUserId == user.Id) {
-		return context.Status(fiber.StatusForbidden).JSON(messageResponse{
-			Message: "Not allowed for no admin users",
+		return context.JSON(403, echo.Map{
+			"message": "not allowed for no admin users",
 		})
 	}
 
@@ -222,146 +192,128 @@ func (*userController) Update(context *fiber.Ctx) error {
 	err = services.Utils.ValidateStruct(user)
 
 	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(errorResponse{
-			Message: "Bad request",
-			Error:   err.Error(),
+		return context.JSON(400, echo.Map{
+			"message": "bad request",
+			"error":   err.Error(),
 		})
 	}
 
 	err = services.User.Update(user)
 
 	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error updating user",
-			Error:   err.Error(),
+		return context.JSON(500, echo.Map{
+			"message": "error updating user",
+			"error":   err.Error(),
 		})
 	}
 
-	return context.Status(fiber.StatusOK).JSON(messageResponse{
-		Message: "User updated",
+	return context.JSON(200, echo.Map{
+		"message": "user updated",
 	})
 }
 
-func (*userController) List(context *fiber.Ctx) error {
-	requestHeaders := context.GetReqHeaders()
-	isAdmin := requestHeaders["Isadmin"] == "true"
-	tokenUserId, err := strconv.ParseUint(requestHeaders["Userid"], 10, 64)
-
-	fmt.Println(requestHeaders)
+func (*userController) List(context echo.Context) error {
+	headers := context.Request().Header
+	isAdmin := headers["Isadmin"][0] == "true"
+	tokenUserId, err := strconv.ParseUint(headers["Userid"][0], 10, 64)
 
 	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error parsing token user id",
-			Error:   err.Error(),
+		return context.JSON(500, echo.Map{
+			"message": "error parsing token user id",
+			"error":   err.Error(),
 		})
 	}
 
-	var query byIdRequest
-	err = context.QueryParser(&query)
-
-	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error parsing query params",
-			Error:   err.Error(),
-		})
-	}
-
-	var users []models.User
-
-	if isAdmin {
-		if query.Id != 0 {
-			user, err := services.User.GetById(query.Id)
-
-			if err != nil {
-				return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-					Message: "Error retrieving user",
-					Error:   err.Error(),
-				})
-			}
-
-			users = append(users, user)
-		} else {
-			users, err = services.User.List()
-
-			if err != nil {
-				return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-					Message: "Error retrieving users",
-					Error:   err.Error(),
-				})
-			}
-		}
-	} else {
+	if !isAdmin {
 		user, err := services.User.GetById(tokenUserId)
 
 		if err != nil {
-			return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-				Message: "Error retrieving user",
-				Error:   err.Error(),
+			return context.JSON(500, echo.Map{
+				"message": "error retrieving user",
+				"error":   err.Error(),
 			})
 		}
 
-		users = append(users, user)
-	}
-
-	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error retrieving users",
-			Error:   err.Error(),
+		return context.JSON(200, echo.Map{
+			"users": []models.User{user},
 		})
 	}
 
-	return context.Status(fiber.StatusOK).JSON(listUsersResponse{
-		Users: users,
+	userId, _ := strconv.ParseUint(context.QueryParam("id"), 10, 64)
+
+	if userId != 0 {
+		user, err := services.User.GetById(userId)
+
+		if err != nil {
+			return context.JSON(500, echo.Map{
+				"message": "error retrieving user",
+				"error":   err.Error(),
+			})
+		}
+
+		return context.JSON(200, echo.Map{
+			"users": []models.User{user},
+		})
+	}
+
+	users, err := services.User.List()
+
+	if err != nil {
+		return context.JSON(500, echo.Map{
+			"message": "error retrieving users",
+			"error":   err.Error(),
+		})
+	}
+
+	return context.JSON(200, echo.Map{
+		"users": users,
 	})
 }
 
-func (*userController) Delete(context *fiber.Ctx) error {
-	requestHeaders := context.GetReqHeaders()
-	isAdmin := requestHeaders["Isadmin"] == "true"
-	tokenUserId, err := strconv.ParseUint(requestHeaders["Userid"], 10, 64)
+func (*userController) Delete(context echo.Context) error {
+	headers := context.Request().Header
+	isAdmin := headers["Isadmin"][0] == "true"
+	tokenUserId, err := strconv.ParseUint(headers["Userid"][0], 10, 64)
 
 	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error parsing token user id",
-			Error:   err.Error(),
+		return context.JSON(500, echo.Map{
+			"message": "error parsing token user id",
+			"error":   err.Error(),
 		})
 	}
 
-	var query byIdRequest
-	err = context.QueryParser(&query)
+	userId, err := strconv.ParseUint(context.QueryParam("id"), 10, 64)
 
 	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error parsing query params",
-			Error:   err.Error(),
+		return context.JSON(400, echo.Map{
+			"message": "bad request",
+			"error":   "id must be a number",
 		})
 	}
 
-	if !(isAdmin || tokenUserId == query.Id) {
-		return context.Status(fiber.StatusForbidden).JSON(messageResponse{
-			Message: "Not allowed for no admin users",
+	if !(isAdmin || tokenUserId == userId) {
+		return context.JSON(403, echo.Map{
+			"message": "not allowed for no admin users",
 		})
 	}
-
-	err = services.Utils.ValidateStruct(query)
 
 	if err != nil {
-		return context.Status(fiber.StatusBadRequest).JSON(errorResponse{
-			Message: "Bad request",
-			Error:   err.Error(),
+		return context.JSON(400, echo.Map{
+			"message": "bad request",
+			"error":   err.Error(),
 		})
 	}
 
-	err = services.User.Delete(query.Id)
+	err = services.User.Delete(userId)
 
 	if err != nil {
-		return context.Status(fiber.StatusInternalServerError).JSON(errorResponse{
-			Message: "Error deleting user",
-			Error:   err.Error(),
+		return context.JSON(500, echo.Map{
+			"message": "error deleting user",
+			"error":   err.Error(),
 		})
 	}
 
-	return context.Status(fiber.StatusOK).JSON(messageResponse{
-		Message: "User deleted",
+	return context.JSON(200, echo.Map{
+		"message": "user deleted",
 	})
 }

@@ -4,11 +4,11 @@ go 1.20
 
 require (
 	github.com/go-playground/validator/v10 v10.12.0
-	github.com/goccy/go-json v0.10.2
 	github.com/gofiber/fiber/v2 v2.43.0
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/johnfercher/maroto v0.40.0
 	github.com/joho/godotenv v1.5.1
+	github.com/labstack/echo/v4 v4.10.2
 	github.com/pkg/errors v0.9.1
 	github.com/sendgrid/sendgrid-go v3.12.0+incompatible
 	github.com/xuri/excelize/v2 v2.7.0
@@ -31,6 +31,7 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/jung-kurt/gofpdf v1.16.2 // indirect
 	github.com/klauspost/compress v1.16.3 // indirect
+	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/leodido/go-urn v1.2.2 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.18 // indirect
@@ -47,6 +48,7 @@ require (
 	github.com/tinylib/msgp v1.1.8 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.45.0 // indirect
+	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect

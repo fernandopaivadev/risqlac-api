@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"risqlac-api/application/services"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 )
 
 type middleware struct{}
@@ -20,49 +20,45 @@ type messageResponse struct {
 	Message string `json:"message"`
 }
 
-func (*middleware) ValidateToken(context *fiber.Ctx) error {
-	headers := context.GetReqHeaders()
-	tokenString := headers["Authorization"]
-	claims, err := services.Utils.ParseToken(tokenString)
+func (*middleware) ValidateToken(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(context echo.Context) error {
+		headers := context.Request().Header
+		tokenString := headers["Authorization"][0]
+		claims, err := services.Utils.ParseToken(tokenString)
 
-	if err != nil {
-		return context.Status(fiber.StatusUnauthorized).JSON(errorResponse{
-			Message: "Error validating token",
-			Error:   err.Error(),
-		})
+		if err != nil {
+			return context.JSON(401, errorResponse{
+				Message: "Error validating token",
+			})
+		}
+
+		user, err := services.User.GetById(claims.UserId)
+
+		if err != nil {
+			return context.JSON(401, errorResponse{
+				Message: "Error retrieving user",
+				Error:   err.Error(),
+			})
+		}
+
+		context.Request().Header.Add("UserId", fmt.Sprint(user.Id))
+		context.Request().Header.Add("IsAdmin", fmt.Sprint(user.IsAdmin))
+
+		return next(context)
 	}
-
-	user, err := services.User.GetById(claims.UserId)
-
-	if err != nil {
-		return context.Status(fiber.StatusUnauthorized).JSON(errorResponse{
-			Message: "Error retrieving user",
-			Error:   err.Error(),
-		})
-	}
-
-	if err != nil {
-		return context.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"message": "Error retrieving user",
-			"error":   err.Error(),
-		})
-	}
-
-	context.Request().Header.Add("UserId", fmt.Sprint(user.Id))
-	context.Request().Header.Add("IsAdmin", fmt.Sprint(user.IsAdmin))
-
-	return context.Next()
 }
 
-func (*middleware) VerifyAdmin(context *fiber.Ctx) error {
-	requestHeaders := context.GetReqHeaders()
-	isAdmin := requestHeaders["Isadmin"] == "true"
+func (*middleware) VerifyAdmin(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(context echo.Context) error {
+		headers := context.Request().Header
+		isAdmin := headers["Isadmin"][0] == "true"
 
-	if !isAdmin {
-		return context.Status(fiber.StatusForbidden).JSON(messageResponse{
-			Message: "Not allowed for no admin users",
-		})
+		if !isAdmin {
+			return context.JSON(403, messageResponse{
+				Message: "Not allowed for no admin users",
+			})
+		}
+
+		return next(context)
 	}
-
-	return context.Next()
 }
