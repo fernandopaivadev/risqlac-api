@@ -6,9 +6,9 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (server *server) LoadMetricsRoutes() {
+func (server *server) LoadDefaultRoutes() {
 	server.Instance.GET("/", func(context echo.Context) error {
-		return context.String(200, "RisQLAC API v2.4.22")
+		return context.String(200, "RisQLAC API v2.5.0")
 	})
 }
 

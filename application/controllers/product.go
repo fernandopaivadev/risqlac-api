@@ -27,7 +27,7 @@ func (*productController) Create(context echo.Context) error {
 
 	if err != nil {
 		return context.JSON(400, echo.Map{
-			"message": "bad request",
+			"message": "validation error",
 			"error":   err.Error(),
 		})
 	}
@@ -41,7 +41,7 @@ func (*productController) Create(context echo.Context) error {
 		})
 	}
 
-	return context.JSON(200, echo.Map{
+	return context.JSON(201, echo.Map{
 		"message": "product created",
 	})
 }
@@ -61,7 +61,7 @@ func (*productController) Update(context echo.Context) error {
 
 	if err != nil {
 		return context.JSON(400, echo.Map{
-			"message": "bad request",
+			"message": "validation error",
 			"error":   err.Error(),
 		})
 	}
@@ -117,14 +117,7 @@ func (*productController) Delete(context echo.Context) error {
 
 	if err != nil {
 		return context.JSON(400, echo.Map{
-			"message": "bad request",
-			"error":   "id must be a number",
-		})
-	}
-
-	if err != nil {
-		return context.JSON(400, echo.Map{
-			"message": "bad request",
+			"message": "validation error",
 			"error":   err.Error(),
 		})
 	}
@@ -156,7 +149,7 @@ func (*productController) GetReportPDF(context echo.Context) error {
 	file, err := services.Product.GetReportPDF(products)
 
 	if err != nil {
-		return context.JSON(400, echo.Map{
+		return context.JSON(500, echo.Map{
 			"message": "error generating pdf",
 			"error":   err.Error(),
 		})
@@ -178,7 +171,7 @@ func (*productController) GetReportCSV(context echo.Context) error {
 	file, err := services.Product.GetReportCSV(products)
 
 	if err != nil {
-		return context.JSON(400, echo.Map{
+		return context.JSON(500, echo.Map{
 			"message": "error generating csv",
 			"error":   err.Error(),
 		})
@@ -200,7 +193,7 @@ func (*productController) GetReportXLSX(context echo.Context) error {
 	file, err := services.Product.GetReportXLSX(products)
 
 	if err != nil {
-		return context.JSON(400, echo.Map{
+		return context.JSON(500, echo.Map{
 			"message": "error generating xlsx",
 			"error":   err.Error(),
 		})

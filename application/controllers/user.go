@@ -18,7 +18,7 @@ func (*userController) Login(context echo.Context) error {
 
 	if email == "" || password == "" {
 		return context.JSON(400, echo.Map{
-			"message": "bad request",
+			"message": "validation error",
 			"error":   "email and password are required",
 		})
 	}
@@ -26,8 +26,8 @@ func (*userController) Login(context echo.Context) error {
 	token, err := services.User.GenerateLoginToken(email, password)
 
 	if err != nil {
-		return context.JSON(401, echo.Map{
-			"message": "error validating credentials",
+		return context.JSON(500, echo.Map{
+			"message": "error generating login token",
 			"error":   err.Error(),
 		})
 	}
@@ -42,15 +42,15 @@ func (*userController) RequestPasswordChange(context echo.Context) error {
 
 	if email == "" {
 		return context.JSON(400, echo.Map{
-			"message": "bad request",
-			"error":   "Email is required",
+			"message": "validation error",
+			"error":   "email is required",
 		})
 	}
 
 	user, err := services.User.GetByEmail(email)
 
 	if err != nil {
-		return context.JSON(404, echo.Map{
+		return context.JSON(500, echo.Map{
 			"message": "error retrieving user",
 			"error":   err.Error(),
 		})
@@ -100,7 +100,7 @@ func (*userController) ChangePassword(context echo.Context) error {
 
 	if password == "" {
 		return context.JSON(400, echo.Map{
-			"message": "bad request",
+			"message": "validation error",
 			"error":   "password is required",
 		})
 	}
@@ -127,8 +127,8 @@ func (*userController) Create(context echo.Context) error {
 	err := context.Bind(&user)
 
 	if err != nil {
-		return context.JSON(400, echo.Map{
-			"message": "bad request",
+		return context.JSON(500, echo.Map{
+			"message": "error parsing body",
 			"error":   err.Error(),
 		})
 	}
@@ -141,7 +141,7 @@ func (*userController) Create(context echo.Context) error {
 
 	if err != nil {
 		return context.JSON(400, echo.Map{
-			"message": "bad request",
+			"message": "validation error",
 			"error":   err.Error(),
 		})
 	}
@@ -155,7 +155,7 @@ func (*userController) Create(context echo.Context) error {
 		})
 	}
 
-	return context.JSON(200, echo.Map{
+	return context.JSON(201, echo.Map{
 		"message": "user created",
 	})
 }
@@ -184,7 +184,7 @@ func (*userController) Update(context echo.Context) error {
 
 	if !(isAdmin || tokenUserId == user.Id) {
 		return context.JSON(403, echo.Map{
-			"message": "not allowed for no admin users",
+			"message": "not allowed for not admin users",
 		})
 	}
 
@@ -193,7 +193,7 @@ func (*userController) Update(context echo.Context) error {
 
 	if err != nil {
 		return context.JSON(400, echo.Map{
-			"message": "bad request",
+			"message": "validation error",
 			"error":   err.Error(),
 		})
 	}
@@ -286,21 +286,14 @@ func (*userController) Delete(context echo.Context) error {
 
 	if err != nil {
 		return context.JSON(400, echo.Map{
-			"message": "bad request",
-			"error":   "id must be a number",
+			"message": "validation error",
+			"error":   err.Error(),
 		})
 	}
 
 	if !(isAdmin || tokenUserId == userId) {
 		return context.JSON(403, echo.Map{
-			"message": "not allowed for no admin users",
-		})
-	}
-
-	if err != nil {
-		return context.JSON(400, echo.Map{
-			"message": "bad request",
-			"error":   err.Error(),
+			"message": "not allowed for not admin users",
 		})
 	}
 

@@ -2,9 +2,11 @@ package application
 
 import (
 	"errors"
+	"net/http"
 	"risqlac-api/environment"
 
 	"github.com/labstack/echo/v4"
+	echoMiddleware "github.com/labstack/echo/v4/middleware"
 )
 
 type server struct {
@@ -15,22 +17,46 @@ var Server server
 
 func (server *server) Setup() {
 	server.Instance = echo.New()
-	// server.App = fiber.New(fiber.Config{
-	// 	JSONEncoder: json.Marshal,
-	// 	JSONDecoder: json.Unmarshal,
-	// })
+	server.Instance.Use(echoMiddleware.Recover())
+	server.Instance.Use(echoMiddleware.Logger())
+	server.Instance.Use(echoMiddleware.RequestID())
+	server.Instance.Use(echoMiddleware.GzipWithConfig(echoMiddleware.GzipConfig{
+		Level: 5,
+		Skipper: func(context echo.Context) bool {
+			path := context.Path()
 
-	// server.App.Use(recover.New())
-	// server.App.Use(logger.New())
-	// server.App.Use(requestid.New())
-	// server.App.Use(compress.New(compress.Config{
-	// 	Level: compress.LevelBestSpeed,
-	// }))
-
-	// server.App.Use(cors.New(cors.Config{
-	// 	AllowOrigins: "*",
-	// 	AllowMethods: "GET,POST,HEAD,PUT,DELETE,PATCH,OPTIONS",
-	// }))
+			switch path {
+			case "/product/report/xlsx":
+				return true
+			case "/product/report/pdf":
+				return true
+			case "/product/report/csv":
+				return true
+			case "/product/report/json":
+				return true
+			default:
+				return false
+			}
+		},
+	}))
+	server.Instance.Use(echoMiddleware.CORSWithConfig(echoMiddleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{
+			http.MethodGet,
+			http.MethodPut,
+			http.MethodPatch,
+			http.MethodPost,
+			http.MethodDelete,
+			http.MethodHead,
+			http.MethodOptions,
+		},
+		AllowHeaders: []string{
+			echo.HeaderOrigin,
+			echo.HeaderContentType,
+			echo.HeaderAccept,
+			echo.HeaderAuthorization,
+		},
+	}))
 }
 
 func (server *server) Start() error {

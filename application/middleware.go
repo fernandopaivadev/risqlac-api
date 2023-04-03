@@ -11,15 +11,6 @@ type middleware struct{}
 
 var Middleware middleware
 
-type errorResponse struct {
-	Message string `json:"message"`
-	Error   string `json:"error"`
-}
-
-type messageResponse struct {
-	Message string `json:"message"`
-}
-
 func (*middleware) ValidateToken(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(context echo.Context) error {
 		headers := context.Request().Header
@@ -27,17 +18,18 @@ func (*middleware) ValidateToken(next echo.HandlerFunc) echo.HandlerFunc {
 		claims, err := services.Utils.ParseToken(tokenString)
 
 		if err != nil {
-			return context.JSON(401, errorResponse{
-				Message: "Error validating token",
+			return context.JSON(400, echo.Map{
+				"message": "token validation error",
+				"Error":   err.Error(),
 			})
 		}
 
 		user, err := services.User.GetById(claims.UserId)
 
 		if err != nil {
-			return context.JSON(401, errorResponse{
-				Message: "Error retrieving user",
-				Error:   err.Error(),
+			return context.JSON(500, echo.Map{
+				"message": "error retrieving user",
+				"error":   err.Error(),
 			})
 		}
 
@@ -54,8 +46,8 @@ func (*middleware) VerifyAdmin(next echo.HandlerFunc) echo.HandlerFunc {
 		isAdmin := headers["Isadmin"][0] == "true"
 
 		if !isAdmin {
-			return context.JSON(403, messageResponse{
-				Message: "Not allowed for no admin users",
+			return context.JSON(403, echo.Map{
+				"message": "not allowed for not admin users",
 			})
 		}
 
