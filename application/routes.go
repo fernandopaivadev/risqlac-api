@@ -8,7 +8,7 @@ import (
 
 func (server *server) LoadDefaultRoutes() {
 	server.Instance.GET("/", func(context echo.Context) error {
-		return context.String(200, "RisQLAC API v2.5.0")
+		return context.String(200, "RisQLAC API v2.5.10")
 	})
 }
 
@@ -19,33 +19,33 @@ func (server *server) LoadUserRoutes() {
 		"/login",
 		controllers.User.Login,
 	)
-	userRoutes.GET(
-		"/request-password-change",
-		controllers.User.RequestPasswordChange,
-	)
-	userRoutes.GET(
-		"/change-password",
-		controllers.User.ChangePassword,
-	)
+	// userRoutes.GET(
+	// 	"/request-password-change",
+	// 	controllers.User.RequestPasswordChange,
+	// )
+	// userRoutes.GET(
+	// 	"/change-password",
+	// 	controllers.User.ChangePassword,
+	// )
 	userRoutes.POST(
 		"/create",
 		controllers.User.Create,
-		// Middleware.ValidateToken,
+		Middleware.ValidateSessionToken,
 	)
 	userRoutes.PUT(
 		"/update",
 		controllers.User.Update,
-		Middleware.ValidateToken,
+		Middleware.ValidateSessionToken,
 	)
 	userRoutes.GET(
 		"/list",
 		controllers.User.List,
-		Middleware.ValidateToken,
+		Middleware.ValidateSessionToken,
 	)
 	userRoutes.DELETE(
 		"/delete",
 		controllers.User.Delete,
-		Middleware.ValidateToken,
+		Middleware.ValidateSessionToken,
 	)
 }
 
@@ -55,39 +55,39 @@ func (server *server) LoadProductRoutes() {
 	productRoutes.POST(
 		"/create",
 		controllers.Product.Create,
-		Middleware.ValidateToken,
+		Middleware.ValidateSessionToken,
 		Middleware.VerifyAdmin,
 	)
 	productRoutes.PUT(
 		"/update",
 		controllers.Product.Update,
-		Middleware.ValidateToken,
+		Middleware.ValidateSessionToken,
 		Middleware.VerifyAdmin,
 	)
 	productRoutes.GET(
 		"/list",
 		controllers.Product.List,
-		Middleware.ValidateToken,
+		Middleware.ValidateSessionToken,
 	)
 	productRoutes.DELETE(
 		"/delete",
 		controllers.Product.Delete,
-		Middleware.ValidateToken,
+		Middleware.ValidateSessionToken,
 		Middleware.VerifyAdmin,
 	)
 	productRoutes.GET(
 		"/report/pdf",
 		controllers.Product.GetReportPDF,
-		Middleware.ValidateToken,
+		Middleware.ValidateSessionToken,
 	)
 	productRoutes.GET(
 		"/report/csv",
 		controllers.Product.GetReportCSV,
-		Middleware.ValidateToken,
+		Middleware.ValidateSessionToken,
 	)
 	productRoutes.GET(
 		"/report/xlsx",
 		controllers.Product.GetReportXLSX,
-		Middleware.ValidateToken,
+		Middleware.ValidateSessionToken,
 	)
 }

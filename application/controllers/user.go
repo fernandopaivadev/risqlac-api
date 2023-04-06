@@ -23,11 +23,11 @@ func (*userController) Login(context echo.Context) error {
 		})
 	}
 
-	token, err := services.User.GenerateLoginToken(email, password)
+	token, err := services.User.GenerateSessionToken(email, password)
 
 	if err != nil {
 		return context.JSON(500, echo.Map{
-			"message": "error generating login token",
+			"message": "error generating session token",
 			"error":   err.Error(),
 		})
 	}
@@ -37,91 +37,9 @@ func (*userController) Login(context echo.Context) error {
 	})
 }
 
-func (*userController) RequestPasswordChange(context echo.Context) error {
-	email := context.QueryParam("email")
-
-	if email == "" {
-		return context.JSON(400, echo.Map{
-			"message": "validation error",
-			"error":   "email is required",
-		})
-	}
-
-	user, err := services.User.GetByEmail(email)
-
-	if err != nil {
-		return context.JSON(500, echo.Map{
-			"message": "error retrieving user",
-			"error":   err.Error(),
-		})
-	}
-
-	token, err := services.User.GeneratePasswordChangeToken(user.Email)
-
-	if err != nil {
-		return context.JSON(500, echo.Map{
-			"message": "error generating password change token",
-			"error":   err.Error(),
-		})
-	}
-
-	err = services.Utils.SendEmail(
-		user.Name,
-		user.Email,
-		"RECUPERAÇÃO DE SENHA",
-		"TOKEN DE RECUPERAÇÃO: "+token,
-		"",
-	)
-
-	if err != nil {
-		return context.JSON(500, echo.Map{
-			"message": "error sending email",
-			"error":   err.Error(),
-		})
-	}
-
-	return context.JSON(200, echo.Map{
-		"message": "password change token sent",
-	})
-}
-
-func (*userController) ChangePassword(context echo.Context) error {
-	headers := context.Request().Header
-	tokenUserId, err := strconv.ParseUint(headers["Userid"][0], 10, 64)
-
-	if err != nil {
-		return context.JSON(500, echo.Map{
-			"message": "error parsing token user id",
-			"error":   err.Error(),
-		})
-	}
-
-	password := context.QueryParam("password")
-
-	if password == "" {
-		return context.JSON(400, echo.Map{
-			"message": "validation error",
-			"error":   "password is required",
-		})
-	}
-
-	err = services.User.ChangePassword(tokenUserId, password)
-
-	if err != nil {
-		return context.JSON(500, echo.Map{
-			"message": "error changing user password",
-			"error":   err.Error(),
-		})
-	}
-
-	return context.JSON(200, echo.Map{
-		"message": "user password changed",
-	})
-}
-
 func (*userController) Create(context echo.Context) error {
 	headers := context.Request().Header
-	isAdmin := headers["Isadmin"][0] == "true"
+	isAdmin := headers["Isadmin"][0] == "1"
 
 	var user models.User
 	err := context.Bind(&user)
@@ -134,7 +52,7 @@ func (*userController) Create(context echo.Context) error {
 	}
 
 	if !isAdmin {
-		user.IsAdmin = false
+		user.IsAdmin = 0
 	}
 
 	err = services.Utils.ValidateStruct(user)
@@ -162,7 +80,7 @@ func (*userController) Create(context echo.Context) error {
 
 func (*userController) Update(context echo.Context) error {
 	headers := context.Request().Header
-	isAdmin := headers["Isadmin"][0] == "true"
+	isAdmin := headers["Isadmin"][0] == "1"
 	tokenUserId, err := strconv.ParseUint(headers["Userid"][0], 10, 64)
 
 	if err != nil {
@@ -214,7 +132,7 @@ func (*userController) Update(context echo.Context) error {
 
 func (*userController) List(context echo.Context) error {
 	headers := context.Request().Header
-	isAdmin := headers["Isadmin"][0] == "true"
+	isAdmin := headers["Isadmin"][0] == "1"
 	tokenUserId, err := strconv.ParseUint(headers["Userid"][0], 10, 64)
 
 	if err != nil {
@@ -272,7 +190,7 @@ func (*userController) List(context echo.Context) error {
 
 func (*userController) Delete(context echo.Context) error {
 	headers := context.Request().Header
-	isAdmin := headers["Isadmin"][0] == "true"
+	isAdmin := headers["Isadmin"][0] == "1"
 	tokenUserId, err := strconv.ParseUint(headers["Userid"][0], 10, 64)
 
 	if err != nil {
