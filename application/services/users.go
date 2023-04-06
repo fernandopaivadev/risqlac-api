@@ -1,10 +1,12 @@
 package services
 
 import (
+	"errors"
 	"risqlac-api/application/models"
 	"risqlac-api/infrastructure"
 	"time"
 
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -12,12 +14,7 @@ type userService struct{}
 
 var User userService
 
-type tokenClaims struct {
-	UserId    uint64 `json:"UserId"`
-	ExpiresAt int64  `json:"ExpiresAt"`
-}
-
-func (service *userService) GenerateLoginToken(email string, password string) (string, error) {
+func (service *userService) GenerateSessionToken(email string, password string) (string, error) {
 	var user models.User
 
 	user, err := service.GetByEmail(email)
@@ -35,37 +32,44 @@ func (service *userService) GenerateLoginToken(email string, password string) (s
 		return "", err
 	}
 
-	tokenString, err := Utils.GenerateJWT(
-		user.Id,
-		time.Now().Add(24*time.Hour).Unix(),
-	)
+	token := uuid.NewString()
+
+	err = Session.Create(&models.Session{
+		Token:     token,
+		UserId:    user.Id,
+		ExpiresAt: time.Now().Add(24 * time.Hour),
+	})
 
 	if err != nil {
 		return "", err
 	}
 
-	return tokenString, nil
+	return token, nil
 }
 
-func (service *userService) GeneratePasswordChangeToken(email string) (string, error) {
+func (*userService) ValidateSessionToken(token string) (models.User, error) {
+	var session models.Session
+
+	session, err := Session.GetByToken(token)
+
+	if err != nil {
+		return models.User{}, err
+	}
+
+	if time.Now().Unix() > session.ExpiresAt.Unix() {
+		_ = Session.Delete(session.Id)
+		return models.User{}, errors.New("token expired")
+	}
+
 	var user models.User
 
-	user, err := service.GetByEmail(email)
+	user, err = User.GetById(session.UserId)
 
 	if err != nil {
-		return "", err
+		return models.User{}, err
 	}
 
-	tokenString, err := Utils.GenerateJWT(
-		user.Id,
-		time.Now().Add(5*time.Minute).Unix(),
-	)
-
-	if err != nil {
-		return "", err
-	}
-
-	return tokenString, nil
+	return user, nil
 }
 
 func (*userService) ChangePassword(userId uint64, newPassword string) error {
@@ -103,6 +107,10 @@ func (*userService) Create(user models.User) error {
 
 	user.Password = string(passwordHash)
 
+	if user.IsAdmin > 0 {
+		user.IsAdmin = 1
+	}
+
 	result := infrastructure.Database.Instance.Create(&user)
 
 	if result.Error != nil {
@@ -113,6 +121,10 @@ func (*userService) Create(user models.User) error {
 }
 
 func (*userService) Update(user models.User) error {
+	if user.IsAdmin > 0 {
+		user.IsAdmin = 1
+	}
+
 	result := infrastructure.Database.Instance.Model(&user).Select(
 		"Email", "Name", "Phone", "Is_admin",
 	).Updates(&user)

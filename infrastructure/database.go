@@ -36,6 +36,12 @@ func (database *database) Connect() error {
 		return errors.New("Error migrating model => " + err.Error())
 	}
 
+	err = db.AutoMigrate(&models.Session{})
+
+	if err != nil {
+		return errors.New("Error migrating model => " + err.Error())
+	}
+
 	database.Instance = db
 
 	return nil

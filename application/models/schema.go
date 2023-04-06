@@ -4,13 +4,22 @@ import (
 	"time"
 )
 
+type Session struct {
+	Id        uint64    `json:"id" gorm:"unique; autoIncrement; primaryKey; <-:create"`
+	Token     string    `json:"token" gorm:"unique" validate:"required"`
+	UserId    uint64    `json:"user_id" validate:"required"`
+	ExpiresAt time.Time `json:"expires_at" validate:"required"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
 type User struct {
 	Id        uint64    `json:"id" gorm:"unique; autoIncrement; primaryKey; <-:create"`
 	Email     string    `json:"email" gorm:"unique" validate:"required,email"`
 	Name      string    `json:"name" validate:"required"`
 	Phone     string    `json:"phone" validate:"required"`
 	Password  string    `json:"password" validate:"required"`
-	IsAdmin   bool      `json:"is_admin"`
+	IsAdmin   uint8     `json:"is_admin"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }

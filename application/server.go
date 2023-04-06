@@ -41,6 +41,11 @@ func (server *server) Setup() {
 			echo.HeaderAuthorization,
 		},
 	}))
+	server.Instance.Use(echoMiddleware.SecureWithConfig(echoMiddleware.SecureConfig{
+		XSSProtection:      "1; mode=block",
+		XFrameOptions:      "deny",
+		ContentTypeNosniff: "nosniff",
+	}))
 }
 
 func (server *server) Start() error {
