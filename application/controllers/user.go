@@ -37,6 +37,74 @@ func (*userController) Login(context echo.Context) error {
 	})
 }
 
+func (*userController) ListSessions(context echo.Context) error {
+	headers := context.Request().Header
+	tokenUserId, err := strconv.ParseUint(headers["Userid"][0], 10, 64)
+
+	if err != nil {
+		return context.JSON(500, echo.Map{
+			"message": "error parsing token user id",
+			"error":   err.Error(),
+		})
+	}
+
+	sessions, err := services.Session.GetByUserId(tokenUserId)
+
+	if err != nil {
+		return context.JSON(500, echo.Map{
+			"message": "error retrieving sessions",
+			"error":   err.Error(),
+		})
+	}
+
+	return context.JSON(200, echo.Map{
+		"sessions": sessions,
+	})
+}
+
+func (*userController) Logout(context echo.Context) error {
+	headers := context.Request().Header
+	token := headers["Authorization"][0]
+
+	err := services.Session.DeleteByToken(token)
+
+	if err != nil {
+		return context.JSON(500, echo.Map{
+			"message": "error logging out",
+			"error":   err.Error(),
+		})
+	}
+
+	return context.JSON(200, echo.Map{
+		"message": "user successfully logged out",
+	})
+}
+
+func (*userController) CompleteLogout(context echo.Context) error {
+	headers := context.Request().Header
+	tokenUserId, err := strconv.ParseUint(headers["Userid"][0], 10, 64)
+
+	if err != nil {
+		return context.JSON(500, echo.Map{
+			"message": "error parsing token user id",
+			"error":   err.Error(),
+		})
+	}
+
+	err = services.Session.DeleteByUserId(tokenUserId)
+
+	if err != nil {
+		return context.JSON(500, echo.Map{
+			"message": "error logging out",
+			"error":   err.Error(),
+		})
+	}
+
+	return context.JSON(200, echo.Map{
+		"message": "user successfully logged out of all sessions",
+	})
+}
+
 func (*userController) Create(context echo.Context) error {
 	headers := context.Request().Header
 	isAdmin := headers["Isadmin"][0] == "1"

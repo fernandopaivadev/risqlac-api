@@ -14,11 +14,11 @@ var Middleware middleware
 func (*middleware) ValidateSessionToken(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(context echo.Context) error {
 		headers := context.Request().Header
-		tokenString := headers["Authorization"][0]
-		user, err := services.User.ValidateSessionToken(tokenString)
+		token := headers["Authorization"][0]
+		user, err := services.User.ValidateSessionToken(token)
 
 		if err != nil {
-			return context.JSON(400, echo.Map{
+			return context.JSON(401, echo.Map{
 				"message": "session token validation error",
 				"Error":   err.Error(),
 			})

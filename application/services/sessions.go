@@ -33,8 +33,36 @@ func (*sessionService) GetByToken(token string) (models.Session, error) {
 	return session, nil
 }
 
-func (*sessionService) Delete(sessionId uint64) error {
-	result := infrastructure.Database.Instance.Delete(&models.Session{}, sessionId)
+func (*sessionService) GetByUserId(userId uint64) ([]models.Session, error) {
+	var sessions []models.Session
+
+	result := infrastructure.Database.Instance.Where(&models.Session{
+		UserId: userId,
+	}).Find(&sessions)
+
+	if result.Error != nil {
+		return []models.Session{}, result.Error
+	}
+
+	return sessions, nil
+}
+
+func (*sessionService) DeleteByToken(token string) error {
+	result := infrastructure.Database.Instance.Where(&models.Session{
+		Token: token,
+	}).Delete(&models.Session{})
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func (*sessionService) DeleteByUserId(userId uint64) error {
+	result := infrastructure.Database.Instance.Where(&models.Session{
+		UserId: userId,
+	}).Delete(&models.Session{})
 
 	if result.Error != nil {
 		return result.Error

@@ -6,13 +6,13 @@ require (
 	github.com/go-playground/validator/v10 v10.12.0
 	github.com/gofiber/fiber/v2 v2.43.0
 	github.com/google/uuid v1.3.0
-	github.com/johnfercher/maroto v0.40.0
+	github.com/johnfercher/maroto v0.41.0
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.10.2
 	github.com/pkg/errors v0.9.1
 	github.com/sendgrid/sendgrid-go v3.12.0+incompatible
-	github.com/xuri/excelize/v2 v2.7.0
-	golang.org/x/crypto v0.7.0
+	github.com/xuri/excelize/v2 v2.7.1
+	golang.org/x/crypto v0.8.0
 	gorm.io/driver/mysql v1.4.7
 	gorm.io/gorm v1.24.6
 )

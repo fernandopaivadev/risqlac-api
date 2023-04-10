@@ -8,7 +8,7 @@ import (
 
 func (server *server) LoadDefaultRoutes() {
 	server.Instance.GET("/", func(context echo.Context) error {
-		return context.String(200, "RisQLAC API v2.5.10")
+		return context.String(200, "RisQLAC API v2.5.12")
 	})
 }
 
@@ -18,6 +18,21 @@ func (server *server) LoadUserRoutes() {
 	userRoutes.GET(
 		"/login",
 		controllers.User.Login,
+	)
+	userRoutes.GET(
+		"/sessions",
+		controllers.User.ListSessions,
+		Middleware.ValidateSessionToken,
+	)
+	userRoutes.DELETE(
+		"/logout",
+		controllers.User.Logout,
+		Middleware.ValidateSessionToken,
+	)
+	userRoutes.DELETE(
+		"/complete-logout",
+		controllers.User.CompleteLogout,
+		Middleware.ValidateSessionToken,
 	)
 	// userRoutes.GET(
 	// 	"/request-password-change",

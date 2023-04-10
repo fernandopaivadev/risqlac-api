@@ -2,7 +2,7 @@ FROM ubuntu:latest
 
 ENV APP_NAME=risqlac-api
 ENV CGO_ENABLED=1
-ENV GO_VERSION=1.20.2
+ENV GO_VERSION=1.20.3
 
 RUN apt update -y && \
 	apt install -y tar && \

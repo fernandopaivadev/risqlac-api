@@ -57,7 +57,7 @@ func (*userService) ValidateSessionToken(token string) (models.User, error) {
 	}
 
 	if time.Now().Unix() > session.ExpiresAt.Unix() {
-		_ = Session.Delete(session.Id)
+		_ = Session.DeleteByToken(session.Token)
 		return models.User{}, errors.New("token expired")
 	}
 
