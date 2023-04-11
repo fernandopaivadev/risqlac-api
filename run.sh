@@ -19,6 +19,6 @@ echo "==> build image"
 podman build -t $APP_NAME .
 
 echo "==> run image"
-podman run -d --name $APP_NAME -p 3000:$PORT $APP_NAME
+podman run -d --name $APP_NAME -p $PORT:3000 $APP_NAME
 
 echo "==> DONE <=="
