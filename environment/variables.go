@@ -8,11 +8,9 @@ import (
 )
 
 type envVars struct {
-	ServerPort          string
-	JwtSecret           string
-	DatabaseUrl         string
-	TelegramBotApiToken string
-	SendgridApiKey      string
+	ServerPort     string
+	DatabaseUrl    string
+	SendgridApiKey string
 }
 
 var Variables envVars
@@ -27,8 +25,6 @@ func Load() {
 	}
 
 	Variables.ServerPort = os.Getenv("SERVER_PORT")
-	Variables.JwtSecret = os.Getenv("JWT_SECRET")
 	Variables.DatabaseUrl = os.Getenv("DATABASE_URL")
-	Variables.TelegramBotApiToken = os.Getenv("TELEGRAM_API_TOKEN")
 	Variables.SendgridApiKey = os.Getenv("SENDGRID_API_KEY")
 }
