@@ -8,32 +8,37 @@ import (
 
 func (server *server) LoadDefaultRoutes() {
 	server.Instance.GET("/", func(context echo.Context) error {
-		return context.String(200, "RisQLAC API v2.5.13")
+		return context.String(200, "RisQLAC API v2.5.15")
 	})
+}
+
+func (server *server) LoadSessionRoutes() {
+	sessionRoutes := server.Instance.Group("/session")
+
+	sessionRoutes.GET(
+		"/login",
+		controllers.Session.Login,
+	)
+	sessionRoutes.GET(
+		"/list",
+		controllers.Session.List,
+		Middleware.ValidateSessionToken,
+	)
+	sessionRoutes.DELETE(
+		"/logout",
+		controllers.Session.Logout,
+		Middleware.ValidateSessionToken,
+	)
+	sessionRoutes.DELETE(
+		"/complete-logout",
+		controllers.Session.CompleteLogout,
+		Middleware.ValidateSessionToken,
+	)
 }
 
 func (server *server) LoadUserRoutes() {
 	userRoutes := server.Instance.Group("/user")
 
-	userRoutes.GET(
-		"/login",
-		controllers.User.Login,
-	)
-	userRoutes.GET(
-		"/sessions",
-		controllers.User.ListSessions,
-		Middleware.ValidateSessionToken,
-	)
-	userRoutes.DELETE(
-		"/logout",
-		controllers.User.Logout,
-		Middleware.ValidateSessionToken,
-	)
-	userRoutes.DELETE(
-		"/complete-logout",
-		controllers.User.CompleteLogout,
-		Middleware.ValidateSessionToken,
-	)
 	// userRoutes.GET(
 	// 	"/request-password-change",
 	// 	controllers.User.RequestPasswordChange,

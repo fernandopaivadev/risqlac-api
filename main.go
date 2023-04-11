@@ -18,6 +18,7 @@ func main() {
 
 	application.Server.Setup()
 	application.Server.LoadDefaultRoutes()
+	application.Server.LoadSessionRoutes()
 	application.Server.LoadUserRoutes()
 	application.Server.LoadProductRoutes()
 
