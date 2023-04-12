@@ -21,6 +21,7 @@ func main() {
 	application.Server.LoadSessionRoutes()
 	application.Server.LoadUserRoutes()
 	application.Server.LoadProductRoutes()
+	application.Server.LoadReportRoutes()
 
 	err = application.Server.Start()
 

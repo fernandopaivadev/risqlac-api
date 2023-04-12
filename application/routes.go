@@ -95,19 +95,24 @@ func (server *server) LoadProductRoutes() {
 		Middleware.ValidateSessionToken,
 		Middleware.VerifyAdmin,
 	)
-	productRoutes.GET(
-		"/report/pdf",
-		controllers.Product.GetReportPDF,
+}
+
+func (server *server) LoadReportRoutes() {
+	reportRoutes := server.Instance.Group("/report")
+
+	reportRoutes.GET(
+		"/products/pdf",
+		controllers.Report.GetProductsReportPDF,
 		Middleware.ValidateSessionToken,
 	)
-	productRoutes.GET(
-		"/report/csv",
-		controllers.Product.GetReportCSV,
+	reportRoutes.GET(
+		"/products/csv",
+		controllers.Report.GetProductsReportCSV,
 		Middleware.ValidateSessionToken,
 	)
-	productRoutes.GET(
-		"/report/xlsx",
-		controllers.Product.GetReportXLSX,
+	reportRoutes.GET(
+		"/products/xlsx",
+		controllers.Report.GetProductsReportXLSX,
 		Middleware.ValidateSessionToken,
 	)
 }
